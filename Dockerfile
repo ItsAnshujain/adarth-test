@@ -23,8 +23,5 @@ WORKDIR /app
 # Copy only necessary files from the builder stage
 COPY --from=builder /app ./
 
-# Remove dev dependencies to save space
-RUN npm prune --omit=dev
-
-# Start the application
+# Start the application without pruning
 CMD ["npm", "run", "start"]
