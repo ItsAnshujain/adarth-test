@@ -11,7 +11,7 @@
     "prettier": "prettier --write \"**/*.{js,jsx,scss}\"",
     "cm": "cz",
     "prepare": "husky install",
-    "postinstall": "patch-package",
+    "postinstall": "node ./node_modules/patch-package/index.js",
     "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules packages/*/node_modules apps/*/.next apps/*/.turbo"
   },
   "dependencies": {
