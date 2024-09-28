@@ -11,10 +11,11 @@
     "prettier": "prettier --write \"**/*.{js,jsx,scss}\"",
     "cm": "cz",
     "prepare": "husky install",
-    "postinstall": "patch-package",
-    "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules packages/*/node_modules apps/*/.next apps/*/.turbo"
+    "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules packages/*/node_modules apps/*/.next apps/*/.turbo",
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then patch-package; fi"
   },
   "dependencies": {
+    "patch-package": "^6.4.7",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fullcalendar/core": "^6.1.9",
