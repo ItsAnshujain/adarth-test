@@ -26,7 +26,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Pull image from docker hub
-        run: docker pull integrationninjas/nextjs-app:latest
+        run: docker pull anshujain24/admin-adarth:latest
       - name: Delete old container
         run: docker rm -f adarth-admin-container  
       - name: Run docker container
