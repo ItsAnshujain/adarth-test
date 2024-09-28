@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "vite preview",
     "lint": "eslint --fix --ext .js,.jsx .",
     "lint:scss": "stylelint \"src/**/*.scss\" --fix",
     "prettier": "prettier --write \"**/*.{js,jsx,scss}\"",
