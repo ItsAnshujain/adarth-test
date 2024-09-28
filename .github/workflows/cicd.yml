@@ -12,28 +12,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Create .env file
-        run: echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env && echo "SITE_URL=${{ secrets.SITE_URL }}" >> .env && echo "VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" >> .env
-        
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+          echo "SITE_URL=${{ secrets.SITE_URL }}" >> .env
+          echo "VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" >> .env
+
       - name: Build docker image
-        run: docker build -t anshujain24/adarth-admin:latest . # Ensure the tag is latest
-        
+        run: docker build -t anshujain24/adarth-admin:latest .
+
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        
+
       - name: Publish image to docker hub
-        run: docker push anshujain24/adarth-admin:latest # Match the tag used above
+        run: docker push anshujain24/adarth-admin:latest
 
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull image from docker hub
-        run: docker pull anshujain24/adarth-admin:latest # Ensure this matches the build image name
+        run: docker pull anshujain24/adarth-admin:latest 
         
       - name: Delete old container
-        run: docker rm -f adarth-admin-container  
+        run: docker rm -f adarth-admin-container || true 
         
       - name: Run docker container
-        run: docker run -d -p 5173:5173 --name adarth-admin-container anshujain24/adarth-admin:latest # Match the tag used above
+        run: docker run -d -p 5173:4173 --name adarth-admin-container anshujain24/adarth-admin:latest
