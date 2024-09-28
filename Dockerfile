@@ -10,16 +10,13 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install only the `patch-package` tool first
-RUN npm install patch-package --legacy-peer-deps
-
-# Install the remaining dependencies (including dev dependencies)
+# Install all dependencies, including dev dependencies
 RUN npm install --legacy-peer-deps
 
-# Run the patch-package tool after it has been installed
+# Run the postinstall script after installing all dependencies
 RUN npm run postinstall
 
-# Remove dev dependencies after postinstall and build
+# Remove dev dependencies after running postinstall
 RUN npm prune --omit=dev
 
 # Copy the rest of the application code
