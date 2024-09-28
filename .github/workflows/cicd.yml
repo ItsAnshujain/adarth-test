@@ -36,4 +36,4 @@ jobs:
         run: docker rm -f adarth-admin-container  
         
       - name: Run docker container
-        run: docker run -d -p 3000:3000 --name adarth-admin-container anshujain24/adarth-admin:latest # Match the tag used above
+        run: docker run -d -p 5173:5173 --name adarth-admin-container anshujain24/adarth-admin:latest # Match the tag used above
