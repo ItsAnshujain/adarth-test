@@ -1,0 +1,33 @@
+name: CI/CD for Next.js application
+
+on:
+  push:
+    branches:
+      - deploy-with-docker-ec2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Create .env file
+        run: echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env && echo "SITE_URL=${{ secrets.SITE_URL }}" >> .env && echo "VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" >> .env
+      - name: Build docker image
+        run: docker build -t anshujain24/adarth-admin .
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Publish image to docker hub
+        run: docker push anshujain24/admin-adarth:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull integrationninjas/nextjs-app:latest
+      - name: Delete old container
+        run: docker rm -f adarth-admin-container  
+      - name: Run docker container
+        run: docker run -d -p 3000:3000 --name adarth-admin-container anshujain24/admin-adarth
