@@ -13,11 +13,8 @@
     "prepare": "husky install",
     "postinstall": "patch-package",
     "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules packages/*/node_modules apps/*/.next apps/*/.turbo"
-  
   },
   "dependencies": {
-    "husky": "^8.0.1",
-    "patch-package": "^6.4.7",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fullcalendar/core": "^6.1.9",
@@ -104,6 +101,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.1",
+    "patch-package": "^6.4.7",
     "postcss": "^8.4.16",
     "prettier": "2.7.1",
     "sass": "^1.54.9",
