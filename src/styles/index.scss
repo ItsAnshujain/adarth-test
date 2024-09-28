@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// custom-scroll-design
+*::-webkit-scrollbar {
+  height: 15px;
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 10px;
+  outline: 1px solid 'transparent';
+}
+
+.has-peer {
+  background-color: #eeeee4 !important;
+}
+
+.primary-button {
+  @apply font-dmSans bg-purple-450 text-white disabled:bg-purple-300 #{!important};
+}
+
+.secondary-button {
+  @apply font-dmSans bg-gray-450 text-black disabled:bg-gray-400 #{!important};
+}
+
+.danger-button {
+  @apply font-dmSans bg-orange-450 text-white disabled:bg-orange-400 #{!important};
+}
+
+.dark-button {
+  @apply font-dmSans bg-black text-white disabled:bg-gray-400 #{!important};
+}
+
+.light-button {
+  @apply font-dmSans bg-white text-black disabled:bg-gray-400 #{!important};
+}
+
+.transparent-black {
+  background: rgb(0 0 0 / 50%);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #4b0daf;
+}
+
+// Full Calendar
+.fc .fc-scrollgrid-section-body table,
+.fc .fc-scrollgrid-section-footer table {
+  tbody {
+    tr:last-child {
+      display: none;
+    }
+  }
+}
+
+.fc .fc-daygrid-day-top {
+  flex-direction: column !important;
+}
+
+.fc .fc-daygrid-day-bg .fc-highlight {
+  background-color: #f4edfe;
+}
+
+.fc-toolbar-title {
+  color: #000;
+  font-size: medium !important;
+}
+
+.fc-toolbar-chunk div {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.fc-toolbar-chunk div button {
+  background-color: transparent !important;
+  border: transparent !important;
+  padding: 0 !important;
+}
+
+.fc-toolbar-chunk div h2 {
+  padding: 5px 10px !important;
+  margin: 0 5px !important;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0;
+}
+
+// view lead stepper style
+
+.leadStepper .stepperItem {
+  margin: 0 0 0 -19px;
+  clip-path: polygon(
+    20px 50%,
+    0% 0%,
+    calc(100% - 20px) 0%,
+    100% 50%,
+    calc(100% - 20px) 100%,
+    0% 100%
+  );
+
+  &:first-child {
+    padding: 20px;
+    clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%);
+  }
+
+  &:last-child {
+    clip-path: polygon(
+      20px 50%,
+      0% 0%,
+      calc(100% - 20px) 0%,
+      100% 50%,
+      calc(100% - 20px) 100%,
+      0% 100%
+    );
+  }
+}
+
+// date input weekend color change
+.mantine-DatePickerInput-day[data-weekend] {
+  color: black !important;
+}
+
+.mantine-DatePickerInput-day[data-weekend][data-selected] {
+  color: white !important;
+}

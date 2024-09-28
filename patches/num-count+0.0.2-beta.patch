@@ -1,0 +1,62 @@
+diff --git a/node_modules/num-count/dataset.json b/node_modules/num-count/dataset.json
+index 0e68cd5..f529f35 100644
+--- a/node_modules/num-count/dataset.json
++++ b/node_modules/num-count/dataset.json
+@@ -1,37 +1,32 @@
+ [
+-    {
+-        "floor": 100,
+-        "celi": 999,
+-        "word": "hundreds"
+-    },
+     {
+         "floor": 1000,
+         "celi": 99999,
+-        "word": "thousands"
++        "word": "K+"
+     },
+     {
+         "floor": 100000,
+         "celi": 9999999,
+-        "word": "lakhs"
++        "word": "L+"
+     },
+     {
+         "floor": 10000000,
+         "celi": 999999999,
+-        "word": "crores"
++        "word": "Cr+"
+     },
+     {
+         "floor": 1000000000,
+         "celi": 9999999999,
+-        "word": "billions"
++        "word": "B+"
+     },
+     {
+         "floor": 1000000000000,
+         "celi": 999999999999999,
+-        "word": "trillions"
++        "word": "T+"
+     },
+     {
+         "floor": 1000000000000000,
+         "celi": 99999999999999999,
+-        "word": "quadrillions"
++        "word": "Q+"
+     }
+ ]
+\ No newline at end of file
+diff --git a/node_modules/num-count/index.js b/node_modules/num-count/index.js
+index 0ceb14e..7108ff3 100644
+--- a/node_modules/num-count/index.js
++++ b/node_modules/num-count/index.js
+@@ -6,7 +6,7 @@ const getWord = (number) =>{
+     const numberString = number.toString();
+     const floorString 	= selectedSet.floor.toString();
+     const lengthDiff = numberString.length - floorString.length +1;
+-    const finalNumber = `${numberString.substr(0, lengthDiff)} ${selectedSet.word}`;
++    const finalNumber = `${numberString.substr(0, lengthDiff)}${selectedSet.word}`;
+     return finalNumber
+ }
+ 
