@@ -10,10 +10,13 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies (including dev dependencies temporarily)
+# Install all dependencies (including dev dependencies)
 RUN npm install --legacy-peer-deps
 
-# Remove dev dependencies after installation
+# Run the patch-package tool before removing dev dependencies
+RUN npm run postinstall
+
+# Remove dev dependencies after postinstall and build
 RUN npm prune --omit=dev
 
 # Copy the rest of the application code
