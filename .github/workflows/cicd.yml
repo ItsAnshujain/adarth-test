@@ -35,12 +35,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Docker info
+        run: docker info
+        
       - name: Pull image from docker hub
         run: sudo docker pull anshujain24/adarth-admin:latest 
-          
+        
       - name: Delete old container
         run: sudo docker rm -f adarth-admin-container || true 
-          
+        
       - name: Run docker container
         run: sudo docker run -d -p 5173:4173 --name adarth-admin-container anshujain24/adarth-admin:latest
-
