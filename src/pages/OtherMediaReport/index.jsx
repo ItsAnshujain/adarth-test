@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 
-const OtherSalesReport = () => {
+const OtherMediaReport = () => {
   return (
     <div>
       <Header title="" />
@@ -14,4 +14,4 @@ const OtherSalesReport = () => {
   );
 };
 
-export default OtherSalesReport;
+export default OtherMediaReport;

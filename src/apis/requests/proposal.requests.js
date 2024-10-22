@@ -14,6 +14,9 @@ export const deleteProposal = proposalId => http.delete(`/proposal/${proposalId}
 export const shareProposal = (id, queries, data) =>
   http.post(`/proposal/${id}/share?${queries}`, data);
 
+export const shareCustomProposal = (id, queries, data) =>
+  http.post(`/proposal/${id}/customShare?${queries}`, data);
+
 export const generateProposalPdf = (id, queries) => http.get(`/proposal/${id}/gen-pdf?${queries}`);
 
 export const createProposalTerms = data => http.post(urlcat('/proposal-terms'), data);

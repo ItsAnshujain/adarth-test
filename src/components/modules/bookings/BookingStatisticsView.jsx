@@ -47,7 +47,7 @@ const BookingStatisticsView = ({ LeadStats, isLoading }) => {
     }),
     [LeadStats],
   );
-console.log("le",directClientCount)
+
   return (
     <div className="mt-5">
       <div className="flex justify-between gap-4 flex-wrap">

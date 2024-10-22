@@ -38,13 +38,13 @@ const defaultValues = {
     contactNumber: '',
     panNumber: '',
     gstNumber: '',
+    clientType: '',
   },
   campaignName: '',
   description: '',
   place: [],
   price: 0,
   industry: '',
-  // industry: '63f9c30b1a5afbaafe11b0c1',
   displayBrands: '',
 };
 
@@ -71,6 +71,7 @@ const basicInformationSchema = yup.object({
       .string()
       .trim()
       .matches(gstRegexMatch, 'GST number must be valid and in uppercase'),
+    clientType: yup.string().trim().required('Client Type is required'),
   }),
   paymentReference: yup.string().trim(),
   paymentType: yup.string().trim(),
@@ -121,6 +122,7 @@ const CreateBookingPage = () => {
       const data = { ...formData };
 
       setFormStep(3);
+      console.log('Client Type: ', data.client.clientType);
 
       if (!watchPlace?.length) {
         showNotification({
@@ -246,6 +248,9 @@ const CreateBookingPage = () => {
       if (data?.client?.gstNumber) {
         data.client.gstNumber = data.client.gstNumber?.toUpperCase();
       }
+      if (data?.client?.clientType) {
+        data.client.clientType = data.client.clientType;
+      }
       if (data?.displayBrands) {
         data.displayBrands = [data.displayBrands];
       }
@@ -337,6 +342,7 @@ const CreateBookingPage = () => {
           contactNumber: client?.contactNumber || '',
           panNumber: client?.panNumber || '',
           gstNumber: client?.gstNumber || '',
+          clientType: client?.clientType || '',
         },
         campaignName: campaign?.name || '',
         description: campaign?.description || '',

@@ -21,6 +21,10 @@ const OrderInformationCard = () => {
           <p className="font-bold">{bookingData?.bookingId || ''}</p>
         </div>
         <div>
+          <p className="text-slate-400">Client type</p>
+          <p className="font-bold">{bookingData?.client.clientType || ''}</p>
+        </div>
+        <div>
           <p className="text-slate-400">Order Date</p>
           <p className="font-bold">
             {bookingData?.createdAt ? dayjs(bookingData?.createdAt).format('D MMMM  YYYY') : ''}

@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import {  useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Table from '../../components/Table/Table';
-import { useBookings } from '../../apis/queries/booking.queries';
 import toIndianCurrency from '../../utils/currencyFormat';
 import { useModals } from '@mantine/modals';
 import { useFetchInventoryReportList } from '../../apis/queries/inventory.queries';
@@ -12,6 +11,7 @@ import SpaceNamePhotoContent from '../../components/modules/inventory/SpaceNameP
 import { Badge } from '@mantine/core';
 
 const PerformanceReport = () => {
+ 
   const modals = useModals();
   const [searchParams1, setSearchParams1] = useSearchParams({
     limit: 20,
@@ -138,9 +138,10 @@ const PerformanceReport = () => {
     setSearchParams1(searchParams1);
   };
   return (
-    <div className="overflow-y-auto px-5 col-span-10 w-[65rem]">
-      <p className="font-bold pt-10">Performance Ranking Report</p>
-      <p className="text-sm text-gray-600 italic py-4">
+    <div className="overflow-y-auto p-5 col-span-10 w-[65rem]">
+      
+      <p className="font-bold pt-6">Performance Ranking Report</p>
+      <p className="text-sm text-gray-600 italic pt-2">
         This report shows Performance Cards with pagination controls and a sortable, paginated
         table.
       </p>

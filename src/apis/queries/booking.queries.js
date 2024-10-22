@@ -25,6 +25,7 @@ import {
   fetchCalendarEvents,
   exportBookings,
   exportBooking,
+  bookingsNew,
 } from '../requests/booking.requests';
 import { onApiError } from '../../utils';
 
@@ -33,6 +34,17 @@ export const useBookings = (filter, enabled = true) =>
     ['bookings', filter],
     async () => {
       const res = await bookings(filter);
+      return res?.data;
+    },
+    {
+      enabled: !!enabled,
+    },
+  );
+export const useBookingsNew = (filter, enabled = true) =>
+  useQuery(
+    ['bookingsNew', filter],
+    async () => {
+      const res = await bookingsNew(filter);
       return res?.data;
     },
     {

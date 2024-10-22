@@ -184,6 +184,23 @@ const BookingsDashboardPage = () => {
           ),
       },
       {
+        Header: 'CLIENT TYPE',
+        accessor: 'client.clientType',
+        Cell: ({
+          row: {
+            original: { client },
+          },
+        }) =>
+          useMemo(
+            () => (
+              <Text className="overflow-hidden text-ellipsis max-w-[180px]" lineClamp={1}>
+                {client?.clientType  || '-'}
+              </Text>
+            ),
+            [],
+          ),
+      },
+      {
         Header: 'ORDER DATE',
         accessor: 'createdAt',
         Cell: ({ row: { original } }) =>

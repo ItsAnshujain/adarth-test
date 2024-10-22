@@ -18,6 +18,7 @@ import {
   generatePublicProposalDoc,
   updateProposalTerms,
   deleteProposalTerms,
+  shareCustomProposal,
 } from '../requests/proposal.requests';
 import { onApiError } from '../../utils';
 
@@ -130,6 +131,28 @@ export const useShareProposal = () => {
   return useMutation(
     async ({ id, queries, data }) => {
       const res = await shareProposal(id, queries, data);
+      return res?.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['proposals-by-id']);
+      },
+      onError: err => {
+        showNotification({
+          title: err?.message,
+          color: 'red',
+        });
+      },
+    },
+  );
+};
+
+export const useShareCustomProposal = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async ({ id, queries, data }) => {
+      const res = await shareCustomProposal(id, queries, data);
       return res?.data;
     },
     {

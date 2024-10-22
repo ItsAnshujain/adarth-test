@@ -1,4 +1,6 @@
+import { ChevronDown } from 'react-feather';
 import { formLabelStyles } from '../../../../utils';
+import ControlledSelect from '../../../shared/FormInputs/Controlled/ControlledSelect';
 import ControlledTextInput from '../../../shared/FormInputs/Controlled/ControlledTextInput';
 
 const BasicInformationForm = () => (
@@ -60,6 +62,16 @@ const BasicInformationForm = () => (
           maxLength={200}
           classNames={formLabelStyles}
         />
+        <ControlledSelect
+            label="Client Type"
+            name="client.clientType"
+            withAsterisk
+            data={["Direct client", "Local Agency", "National Agency", "Government"]}
+            placeholder="Select..."
+            rightSection={<ChevronDown size={16} />}
+            className="mb-7"
+            classNames={formLabelStyles}
+          />
       </section>
     </article>
   </div>

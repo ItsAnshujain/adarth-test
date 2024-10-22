@@ -40,6 +40,8 @@ import { useFetchMasterById } from '../../apis/queries/masters.queries';
 import ViewPriceDrawer from '../../components/modules/proposals/ViewProposal/ViewPriceDrawer';
 import InventoryPreviewImage from '../../components/shared/InventoryPreviewImage';
 import { DATE_SECOND_FORMAT } from '../../utils/constants';
+import { useQueryClient } from '@tanstack/react-query';
+import { useFetchUsers } from '../../apis/queries/users.queries';
 
 const updatedModalConfig = {
   ...modalConfig,
@@ -85,6 +87,11 @@ const ProposalDetailsPage = () => {
     sortOrder: 'desc',
   });
 
+  // validation
+  const queryClient = useQueryClient();
+  const userData = queryClient.getQueryData(['users-by-id', userId]);
+  // validation
+
   const toggleFilter = () => setShowFilter(!showFilter);
 
   const [versionDrawerOpened, versionDrawerActions] = useDisclosure();
@@ -114,22 +121,25 @@ const ProposalDetailsPage = () => {
       ...updatedModalConfig,
     });
 
-  const toggleShareOptions = (id, versionTitle) => {
-    modals.openModal({
-      modalId: 'shareProposalOption',
-      title: 'Share and Download Option',
-      children: (
-        <ShareContent
-          shareType="proposal"
-          id={id}
-          onClose={() => modals.closeModal('shareProposalOption')}
-          versionTitle={versionTitle}
-          mediaOwner={proposalData?.proposal?.creator?.name.replace(' ', '_')}
-        />
-      ),
-      ...modalConfig,
-    });
-  };
+    const toggleShareOptions = (id, versionTitle) => {
+      
+      modals.openModal({
+        modalId: 'shareProposalOption',
+        title: 'Share and Download Option',
+        children: (
+          <ShareContent
+            shareType="proposal"
+            id={id}
+            onClose={() => modals.closeModal('shareProposalOption')}
+            versionTitle={versionTitle}
+            mediaOwner={proposalData?.proposal?.creator?.name.replace(' ', '_')}
+            userData={userData} // Pass all user data as a prop
+          />
+        ),
+        ...modalConfig,
+      });
+    };
+    
 
   const COLUMNS = useMemo(
     () => [

@@ -21,9 +21,6 @@ const schema = yup.object({
     .max(32, 'Password must be at most 32 characters long')
     .required('Password is required'),
 });
-console.log('Environment Variables:', import.meta.env);
-
-console.log("API URL: ", API_URL);
 
 const LoginPage = () => {
   const navigate = useNavigate();

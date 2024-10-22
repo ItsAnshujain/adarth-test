@@ -74,6 +74,7 @@ const SelectSpace = () => {
   const [drawerOpened, drawerActions] = useDisclosure();
   const selectedInventoryIds = useMemo(() => watchPlace.map(space => space._id));
 
+  const [showDateRangeOptions, setShowDateRangeOptions] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams({
     limit: activeLayout.inventoryLimit || 20,
     page: 1,
@@ -109,126 +110,186 @@ const SelectSpace = () => {
         ? 4
         : 1) || 0;
 
-  const updateData = debounce((key, val, id, inputId) => {
+  const handleDateRangeChange = (startDate, endDate, id) => {
+    setShowDateRangeOptions(prev => ({
+      ...prev,
+      [id]: true,
+    }));
+
+    updateData('dateRange', [startDate, endDate], id, null, false);
+  };
+
+  const applyDateRangeToAll = (startDate, endDate) => {
+    const selectedIds = watchPlace.map(space => space._id);
+
+    updateData('dateRange', [startDate, endDate], null, null, true, selectedIds);
+    setShowDateRangeOptions({});
+  };
+
+  const updateData = debounce((key, val, id, inputId, applyToAll, selectedIds = []) => {
     if (key === 'dateRange') {
-      let availableUnit = 0;
-      const place = watchPlace.find(item => item._id === id);
-
-      const hasChangedUnit = place?.hasChangedUnit;
-      setUpdatedInventoryData(prev => {
-        const newList = [...prev];
-        const index = newList.findIndex(item => item._id === id);
-        newList[index] = { ...newList[index], startDate: val[0], endDate: val[1] };
-
-        availableUnit = getAvailableUnits(
-          newList[index].bookingRange,
-          newList[index].startDate,
-          newList[index].endDate,
-          newList[index].originalUnit,
-        );
-        newList[index] = { ...newList[index], availableUnit };
-        return newList;
-      });
-
       const totalMonths = calculateTotalMonths(val[0], val[1]);
 
+      setUpdatedInventoryData(prev => {
+        return prev.map(item => {
+          const space = watchPlace.find(sp => sp._id === item._id);
+          const availableUnit = getAvailableUnits(
+            item.bookingRange,
+            val[0],
+            val[1],
+            item.originalUnit,
+          );
+
+          if (applyToAll && selectedIds.includes(item._id)) {
+            return {
+              ...item,
+              startDate: val[0],
+              endDate: val[1],
+              availableUnit,
+              displayCostPerMonth: space?.displayCostPerMonth || 0,
+              displayCostPerSqFt:
+                calculateTotalArea(item, item.unit) > 0
+                  ? Number(
+                      (
+                        (item.displayCostPerMonth || 0) / calculateTotalArea(item, item.unit)
+                      ).toFixed(2),
+                    )
+                  : 0,
+              totalDisplayCost:
+                calculateTotalArea(item, item.unit) > 0
+                  ? (item.displayCostPerMonth || 0) * totalMonths
+                  : 0,
+              totalPrintingCost: calculateTotalPrintingOrMountingCost(
+                item,
+                item.unit,
+                item.printingCostPerSqft || 0,
+                0,
+              ),
+              totalMountingCost: calculateTotalPrintingOrMountingCost(
+                item,
+                item.unit,
+                item.mountingCostPerSqft || 0,
+                0,
+              ),
+              price: calculateTotalCostOfBooking(item, item.unit, val[0], val[1]),
+            };
+          } else if (item._id === id) {
+            return {
+              ...item,
+              startDate: val[0],
+              endDate: val[1],
+              availableUnit,
+              displayCostPerMonth: space?.displayCostPerMonth || 0,
+              displayCostPerSqFt:
+                calculateTotalArea(item, item.unit) > 0
+                  ? Number(
+                      (
+                        (item.displayCostPerMonth || 0) / calculateTotalArea(item, item.unit)
+                      ).toFixed(2),
+                    )
+                  : 0,
+              totalDisplayCost:
+                calculateTotalArea(item, item.unit) > 0
+                  ? (item.displayCostPerMonth || 0) * totalMonths
+                  : 0,
+              totalPrintingCost: calculateTotalPrintingOrMountingCost(
+                item,
+                item.unit,
+                item.printingCostPerSqft || 0,
+                0,
+              ),
+              totalMountingCost: calculateTotalPrintingOrMountingCost(
+                item,
+                item.unit,
+                item.mountingCostPerSqft || 0,
+                0,
+              ),
+              price: calculateTotalCostOfBooking(item, item.unit, val[0], val[1]),
+            };
+          } else {
+            return item;
+          }
+        });
+      });
+
+      // Update the form values
       form.setValue(
         'place',
-        watchPlace.map(item =>
-          item._id === id
+        watchPlace.map(item => {
+          const updatedTotalArea = calculateTotalArea(item, item.unit);
+          return applyToAll || item._id === id
             ? {
                 ...item,
                 startDate: val[0],
                 endDate: val[1],
-                previousStartDate: !val[0] ? item.startDate : null,
-                previousEndDate: !val[1] ? item.endDate : null,
-                ...(!hasChangedUnit ? { unit: availableUnit } : {}),
-                availableUnit,
-                price: calculateTotalCostOfBooking(
-                  item,
-                  key === 'unit' ? val : item.unit,
+                availableUnit: getAvailableUnits(
+                  item.bookingRange,
                   val[0],
                   val[1],
+                  item.originalUnit,
                 ),
                 displayCostPerSqFt:
-                  calculateTotalArea(item, item?.unit) > 0
-                    ? Number(
-                        (
-                          item.displayCostPerMonth /
-                          calculateTotalArea(item, key === 'unit' ? val : item?.unit)
-                        ).toFixed(2),
-                      )
+                  updatedTotalArea > 0
+                    ? Number(((item.displayCostPerMonth || 0) / updatedTotalArea).toFixed(2))
                     : 0,
-                totalDisplayCost: calculateTotalAmountWithPercentage(
-                  item.displayCostPerMonth * totalMonths,
-                  item.displayCostGstPercentage,
-                ),
+                totalDisplayCost:
+                  updatedTotalArea > 0 ? (item.displayCostPerMonth || 0) * totalMonths : 0,
                 totalPrintingCost: calculateTotalPrintingOrMountingCost(
                   item,
-                  key === 'unit' ? val : item.unit,
-                  item.printingCostPerSqft,
-                  item.printingGstPercentage,
+                  item.unit,
+                  item.printingCostPerSqft || 0,
+                  0,
                 ),
                 totalMountingCost: calculateTotalPrintingOrMountingCost(
                   item,
-                  key === 'unit' ? val : item.unit,
-                  item.mountingCostPerSqft,
-                  item.mountingGstPercentage,
+                  item.unit,
+                  item.mountingCostPerSqft || 0,
+                  0,
                 ),
+                price: calculateTotalCostOfBooking(item, item.unit, val[0], val[1]),
               }
-            : item,
-        ),
+            : item;
+        }),
       );
     } else {
       setUpdatedInventoryData(prev =>
         prev.map(item =>
           item._id === id
-            ? { ...item, [key]: val, ...(key === 'unit' ? { hasChangedUnit: true } : {}) }
+            ? {
+                ...item,
+                [key]: val,
+                ...(key === 'unit' ? { hasChangedUnit: true } : {}),
+              }
             : item,
         ),
       );
 
       form.setValue(
         'place',
-        watchPlace.map(item =>
-          item._id === id
+        watchPlace.map(item => {
+          const updatedTotalArea = calculateTotalArea(item, key === 'unit' ? val : item.unit);
+          return item._id === id
             ? {
                 ...item,
-                tradedAmount: key === 'tradedAmount' ? val : item.tradedAmount,
-                printingCostPerSqft: item.printingCostPerSqft,
-                printingGst: item.printingGst,
-                printingGstPercentage: item.printingGstPercentage,
-
-                totalDisplayCost: calculateTotalAmountWithPercentage(
-                  item.displayCostPerMonth * calculateTotalMonths(item.startDate, item.endDate),
-                  item.displayCostGstPercentage,
-                ),
                 displayCostPerSqFt:
-                  calculateTotalArea(item, item?.unit) > 0
-                    ? Number(
-                        (
-                          item.displayCostPerMonth /
-                          calculateTotalArea(item, key === 'unit' ? val : item?.unit)
-                        ).toFixed(2),
-                      )
+                  updatedTotalArea > 0
+                    ? Number((item.displayCostPerMonth / updatedTotalArea).toFixed(2))
                     : 0,
+                printingCostPerSqft: item.printingCostPerSqft,
+                mountingCostPerSqft: item.mountingCostPerSqft,
                 totalPrintingCost: calculateTotalPrintingOrMountingCost(
                   item,
                   key === 'unit' ? val : item.unit,
-                  item.printingCostPerSqft,
-                  item.printingGstPercentage,
+                  item.printingCostPerSqft || 0,
+                  0,
                 ),
                 totalMountingCost: calculateTotalPrintingOrMountingCost(
                   item,
                   key === 'unit' ? val : item.unit,
-                  item.mountingCostPerSqft,
-                  item.mountingGstPercentage,
+                  item.mountingCostPerSqft || 0,
+                  0,
                 ),
-                mountingCostPerSqft: item.mountingCostPerSqft,
-                mountingGst: item.mountingGst,
-                mountingGstPercentage: item.mountingGstPercentage,
-
-                totalArea: calculateTotalArea(item, item.unit),
+                totalArea: updatedTotalArea,
                 price: calculateTotalCostOfBooking(
                   item,
                   key === 'unit' ? val : item.unit,
@@ -238,13 +299,13 @@ const SelectSpace = () => {
                 [key]: val,
                 ...(key === 'unit' ? { hasChangedUnit: true } : {}),
               }
-            : item,
-        ),
+            : item;
+        }),
       );
+    }
 
-      if (inputId) {
-        setTimeout(() => document.querySelector(`#${inputId}`)?.focus());
-      }
+    if (inputId) {
+      setTimeout(() => document.querySelector(`#${inputId}`)?.focus());
     }
   }, 500);
 
@@ -487,7 +548,25 @@ const SelectSpace = () => {
         Cell: RenderDimensionCell,
       },
       {
-        Header: 'OCCUPANCY DATE',
+        Header: () => (
+          <div className="flex justify-between">
+            <span title="Tick to apply the same occupancy date to the selected rows.">
+              OCCUPANCY DATE
+            </span>
+            <div className="pl-44">
+              <input
+                type="checkbox"
+                title="Tick to apply the same occupancy  date to the selected rows."
+                onChange={e => {
+                  const firstSelectedRow = watchPlace[0] || {};
+                  if (e.target.checked) {
+                    applyDateRangeToAll(firstSelectedRow.startDate, firstSelectedRow.endDate);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        ),
         accessor: 'scheduledDate',
         disableSortBy: true,
         Cell: ({
@@ -527,7 +606,8 @@ const SelectSpace = () => {
                 <DateRangeSelector
                   error={isDisabled}
                   dateValue={[startDate || null, endDate || null]}
-                  onChange={val => updateData('dateRange', val, _id)}
+                  
+                onChange={val => handleDateRangeChange(val[0], val[1], _id)}
                   everyDayUnitsData={everyDayUnitsData}
                 />
               </div>

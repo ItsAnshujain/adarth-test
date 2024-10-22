@@ -36,7 +36,7 @@ const PerformanceCard = () => {
 
   const cardData = [
     {
-      title: 'Top Space by Bookings',
+      title: 'Top Performing Space by Bookings',
       data: {
         name: topSpaceByBookings?.basicInformation?.spaceName || 'N/A',
         value: topSpaceByBookings?.totalBookings || 0,
@@ -46,7 +46,7 @@ const PerformanceCard = () => {
       },
     },
     {
-      title: 'Least Space by Bookings',
+      title: 'Least Performing Space by Bookings',
       data: {
         name: leastSpaceByBookings?.basicInformation?.spaceName || 'N/A',
         value: leastSpaceByBookings?.totalBookings || 0,
@@ -56,7 +56,7 @@ const PerformanceCard = () => {
       },
     },
     {
-      title: 'Top Space by Revenue',
+      title: 'Top Performing Space by Revenue',
       data: {
         name: topSpaceByRevenue?.basicInformation?.spaceName || 'N/A',
         value: toIndianCurrency((topSpaceByRevenue?.revenue || 0) / 100000), // Convert to lacs
@@ -66,7 +66,7 @@ const PerformanceCard = () => {
       },
     },
     {
-      title: 'Least Space by Revenue',
+      title: 'Least Performing Space by Revenue',
       data: {
         name: leastSpaceByRevenue?.basicInformation?.spaceName || 'N/A',
         value: toIndianCurrency((leastSpaceByRevenue?.revenue || 0) / 100000), // Convert to lacs

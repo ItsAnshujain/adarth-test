@@ -131,18 +131,30 @@ const SidebarContent = ({ className }) => {
         icon: ReportIcon,
         acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
       },
+      // {
+      //   label: 'Ranking_report',
+      //   path: '/performanceReport',
+      //   icon: ReportIcon,
+      //   acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
+      // },
+      // {
+      //   label: 'Client_Details',
+      //   path: '/tagsWiseReport',
+      //   icon: ReportIcon,
+      //   acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
+      // },
       {
-        label: 'Ranking_report',
-        path: '/performanceReport',
+        label: 'mediawiseRepo',
+        path: '/mediaWiseReport',
         icon: ReportIcon,
         acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
       },
-      {
-        label: 'Sales_report',
-        path: '/salesReport',
-        icon: ReportIcon,
-        acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
-      },
+      // {
+      //   label: 'SampleRepo',
+      //   path: '/sampleReport',
+      //   icon: ReportIcon,
+      //   acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
+      // },
     ],
     [isMasterLoaded],
   );
@@ -150,7 +162,7 @@ const SidebarContent = ({ className }) => {
   return (
     <div className={classNames('flex flex-col items-start', className)}>
       {sidebarMenuList.map(item => (
-        // <RoleBased acceptedRoles={item.acceptedRoles} key={uuidv4()}>
+        <RoleBased acceptedRoles={item.acceptedRoles} key={uuidv4()}>
           <div
             className={classNames(
               'w-full flex flex-col rounded-[4px]',
@@ -183,7 +195,7 @@ const SidebarContent = ({ className }) => {
               toggleNestedTab={toggleNestedTab}
             />
           </div>
-        // </RoleBased>
+         </RoleBased>
       ))}
     </div>
   );

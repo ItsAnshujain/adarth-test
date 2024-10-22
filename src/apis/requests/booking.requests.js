@@ -1,7 +1,9 @@
 import urlcat from 'urlcat';
 import http from '../http';
 
-export const bookings = filter => http.get(`/booking?${filter}`);
+export const bookings = filter => http.get(`/booking/basic?${filter}`);
+
+export const bookingsNew = filter => http.get(`/booking?${filter}`);
 
 export const fetchbookingById = id => http.get(`/booking/${id}`);
 

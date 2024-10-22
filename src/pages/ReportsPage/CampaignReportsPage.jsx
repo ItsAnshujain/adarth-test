@@ -119,8 +119,7 @@ const CampaignReportsPage = () => {
     () => ({
       datasets: [
         {
-          // data: [stats?.printCompleted ?? 0, stats?.printOngoing ?? 0],
-          data: [6, 4],
+          data: [stats?.printCompleted ?? 0, stats?.printOngoing ?? 0],
           backgroundColor: ['#914EFB', '#FF900E'],
           borderColor: ['#914EFB', '#FF900E'],
           borderWidth: 1,
@@ -134,8 +133,7 @@ const CampaignReportsPage = () => {
     () => ({
       datasets: [
         {
-          // data: [stats?.mountCompleted ?? 0, stats?.mountOngoing ?? 0],
-          data: [1,9],
+          data: [stats?.mountCompleted ?? 0, stats?.mountOngoing ?? 0],
           backgroundColor: ['#914EFB', '#FF900E'],
           borderColor: ['#914EFB', '#FF900E'],
           borderWidth: 1,
@@ -263,7 +261,7 @@ const CampaignReportsPage = () => {
   const handleDownloadPdf = async () => {
     const activeUrl = new URL(window.location.href);
     activeUrl.searchParams.append('share', 'report');
-
+    console.log("active url", activeUrl)
     await mutateAsync(
       { url: activeUrl.toString() },
       {
@@ -275,10 +273,12 @@ const CampaignReportsPage = () => {
           if (data?.link) {
             downloadPdf(data.link);
           }
+          console.log("data", data)
         },
       },
     );
   };
+
 
   useEffect(() => {
     calculateBarData();

@@ -26,15 +26,14 @@ const CampaignPieContent = ({ isStatsLoading, mountStatusData, printStatusData, 
             <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
             <div>
               <p className="my-2 text-xs font-light text-slate-400">Ongoing</p>
-              {/* <p className="font-bold text-lg">{stats?.printOngoing ?? 0}</p> */}
-              <p className="font-bold text-lg">10</p>
+              <p className="font-bold text-lg">{stats?.printOngoing ?? 0}</p>
             </div>
           </div>
           <div className="flex gap-2 items-center">
             <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
             <div>
               <p className="my-2 text-xs font-light text-slate-400">Completed</p>
-              <p className="font-bold text-lg">4</p>
+              <p className="font-bold text-lg">{stats?.printCompleted ?? 0}</p>
             </div>
           </div>
         </div>
@@ -57,16 +56,14 @@ const CampaignPieContent = ({ isStatsLoading, mountStatusData, printStatusData, 
             <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
             <div>
               <p className="my-2 text-xs font-light text-slate-400">Ongoing</p>
-              {/* <p className="font-bold text-lg">{stats?.mountOngoing ?? 0}</p> */}
-              <p className="font-bold text-lg">9</p>
+              <p className="font-bold text-lg">{stats?.mountOngoing ?? 0}</p>
             </div>
           </div>
           <div className="flex gap-2 items-center">
             <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
             <div>
               <p className="my-2 text-xs font-light text-slate-400">Completed</p>
-              {/* <p className="font-bold text-lg">{stats?.mountCompleted ?? 0}</p> */}
-              <p className="font-bold text-lg">1</p>
+              <p className="font-bold text-lg">{stats?.mountCompleted ?? 0}</p>
             </div>
           </div>
         </div>

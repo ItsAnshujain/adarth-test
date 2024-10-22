@@ -6,24 +6,60 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const drawNeedlePlugin = {
   id: 'drawNeedle',
   afterDatasetDraw(chart, args, options) {
-    const { ctx, data, chartArea: { width, height }, } = chart;
-    const dataset = data.datasets[0];
+    const { ctx, chartArea: { width, height } } = chart;
 
-    // Validate needleValue
-    const needleValue = options.needleValue ?? 0; // Default to 0 if not provided
-    const dataTotal = dataset.data.reduce((a, b) => a + b, 0); // Total of the dataset values
-    const angle = (Math.PI + (Math.PI * (needleValue / 100))); // Based on percentage
+    const needleValue = options.needleValue ?? 0;
+    const invoiceRaised = options.invoiceRaised ?? 0;
+    const intervals = 10; // Number of tick marks on the circular portion
+    const stepAngle = Math.PI / intervals; // Step angle for each interval
+    const stepAmount = invoiceRaised / intervals; // Amount for each step (based on total invoiceRaised)
 
-    const cx = width / 2;
-    const cy = chart._metasets[0].data[0].y;
+    const cx = width / 1.68; // Center x
+    const cy = height * 0.93; // Adjust center y to be closer to the bottom of the chart
+    const radius = height / 2.5; // Radius for the tick marks
+
+    // Adjust the radius for tick marks and labels to be spaced properly
+    const outerTickRadius = radius + 35; // Slightly reduce the outer radius to avoid overlapping
+    const innerTickRadius = radius + 30; // Adjust inner radius accordingly
+    const labelRadius = radius + 45; // Keep labels further from the chart
+
+    ctx.save();
+    for (let i = 0; i <= intervals; i++) {
+      const angle = Math.PI + stepAngle * i; // Calculate the angle for each tick mark
+
+      // Tick mark start and end coordinates
+      const xStart = cx + outerTickRadius * Math.cos(angle);
+      const yStart = cy + outerTickRadius * Math.sin(angle);
+      const xEnd = cx + innerTickRadius * Math.cos(angle);
+      const yEnd = cy + innerTickRadius * Math.sin(angle);
+
+      // Draw the tick mark
+      ctx.beginPath();
+      ctx.moveTo(xStart, yStart);
+      ctx.lineTo(xEnd, yEnd);
+      ctx.strokeStyle = '#000'; // Color of the tick marks
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Draw the invoice amount label at each tick mark, outside the tick
+      const invoiceAmount = (stepAmount * i).toFixed(2); // Calculate the invoice amount for each tick
+      const xText = cx + labelRadius * Math.cos(angle); // Move the text further outside the ring
+      const yText = cy + labelRadius * Math.sin(angle);
+
+      ctx.font = '10px Arial'; // Adjust font size for readability
+      ctx.fillStyle = '#000';
+      ctx.fillText(`${invoiceAmount}`, xText - 10, yText + 5); // Position the amount below the tick
+    }
+    ctx.restore();
 
     // Draw the needle
+    const angle = Math.PI + Math.PI * (needleValue / 100); // Angle for the needle
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.moveTo(0, -2);
-    ctx.lineTo(height / 2.5, 0);
+    ctx.lineTo(radius, 0);
     ctx.lineTo(0, 2);
     ctx.fillStyle = '#444';
     ctx.fill();
@@ -36,23 +72,10 @@ const drawNeedlePlugin = {
     ctx.fill();
     ctx.restore();
 
-    // Draw a horizontal line from 0 to 100% on the x-axis
-    ctx.beginPath();
-    ctx.moveTo(0, cy); // Start from 0 on the x-axis
-    ctx.lineTo(width, cy); // End at the full width of the chart
-    ctx.strokeStyle = '#000'; // Line color
-    ctx.lineWidth = 1; // Line thickness
-    ctx.stroke();
-
-    // Draw text on the left side (start), below the x-axis
-    const leftText = '0'; // Left text (start)
-    ctx.font = '16px Arial';
+    ctx.font = '12px Arial';
     ctx.fillStyle = '#000';
-    ctx.fillText(leftText, 10, cy + 20); // Position text below the x-axis
-
-    // Draw text on the right side (end), below the x-axis
-    const rightText = options.rightText ?? `${dataTotal}`; // Right text (end), default to total amount
-    ctx.fillText(rightText, width - ctx.measureText(rightText).width - 10, cy + 20); // Position text below the x-axis
+    const label = '(Amount In lac)';
+    ctx.fillText(label, width / 1.7 - ctx.measureText(label).width / 2, cy - radius - 80);
   },
 };
 
@@ -61,32 +84,37 @@ const GaugeChart = ({ invoiceRaised, amountCollected }) => {
   const remainingPercentage = 100 - collectedPercentage;
 
   const data = {
-    labels: ["Amount collected", "Invoice Raised"],
+    labels: ['Amount collected', 'Invoice Raised'],
     datasets: [
       {
-        data: [collectedPercentage, remainingPercentage], // Collected and remaining scale
-        backgroundColor: ['#914EFB', '#E0E0E0'], // Adjust the colors accordingly
+        data: [collectedPercentage, remainingPercentage],
+        backgroundColor: ['#914EFB', '#E0E0E0'],
         borderWidth: 0,
-        circumference: 180, // Half-circle
-        rotation: -90, // Start at the top
+        circumference: 180,
+        rotation: -90,
       },
     ],
   };
 
   const options = {
     responsive: true,
-    cutout: '80%', // Adjust the inner radius
-    circumference: 180, // Half-circle
-    rotation: -90, // Start from the bottom center
+    cutout: '80%',
+    circumference: 180,
+    rotation: -90,
+    layout: {
+      padding: {
+        left: 30,   // Increase padding to space out content
+        right: 30,  
+      },
+    },
     plugins: {
       tooltip: {
-        enabled: true, // Enable tooltips on hover
+        enabled: true,
         callbacks: {
-          label: (tooltipItem) => {
-            // Show actual amount instead of percentage
+          label: tooltipItem => {
             const label = tooltipItem.label;
             const value = tooltipItem.raw;
-            if (label === "Amount collected") {
+            if (label === 'Amount collected') {
               return `Amount Collected: ${amountCollected.toFixed(2)}`;
             } else {
               return `Invoice Raised: ${invoiceRaised.toFixed(2)}`;
@@ -95,21 +123,18 @@ const GaugeChart = ({ invoiceRaised, amountCollected }) => {
         },
       },
       drawNeedle: {
-        needleValue: collectedPercentage, // Needle shows the collected percentage
-        rightText: `${invoiceRaised.toFixed(2)}`, // Right end side shows the total invoice raised amount
+        needleValue: collectedPercentage,
+        rightText: `${invoiceRaised.toFixed(2)}`,
+        invoiceRaised,
       },
     },
   };
 
   return (
-    <div style={{ width: '300px', height: '150px', marginInline:"22rem" , marginTop:"1rem" }}>
-      <Doughnut
-        data={data}
-        options={options}
-        plugins={[drawNeedlePlugin]} // Only apply the needle plugin to this chart
-      />
-      <div style={{ textAlign: 'center', marginTop: '-30px' }}>
-        <strong>{collectedPercentage.toFixed(2)}%</strong> Amount Collected
+    <div className="w-[350px] overflow-x-auto overflow-y-hidden">
+      <Doughnut data={data} options={options} plugins={[drawNeedlePlugin]} />
+      <div className="text-center">
+        <p className="text-xs mt-[-70px]">{collectedPercentage.toFixed(2)}% Amount Collected</p>
       </div>
     </div>
   );
