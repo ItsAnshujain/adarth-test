@@ -143,12 +143,12 @@ const SidebarContent = ({ className }) => {
       //   icon: ReportIcon,
       //   acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
       // },
-      {
-        label: 'mediawiseRepo',
-        path: '/mediaWiseReport',
-        icon: ReportIcon,
-        acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
-      },
+      // {
+      //   label: 'mediawiseRepo',
+      //   path: '/mediaWiseReport',
+      //   icon: ReportIcon,
+      //   acceptedRoles: [ROLES.ADMIN, ROLES.MANAGEMENT, ROLES.SUPERVISOR, ROLES.ASSOCIATE],
+      // },
       // {
       //   label: 'SampleRepo',
       //   path: '/sampleReport',

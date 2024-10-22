@@ -26,6 +26,7 @@ import OrderDetails from '../../components/modules/newReports/OrdersDetails';
 import RevenueBreakup from '../../components/modules/newReports/RevenueBreakup';
 import ProposalDetails from '../../components/modules/newReports/ProposalDetails';
 import CampaignCards from '../../components/modules/newReports/CampaingCards';
+import SalesOverview from '../../components/modules/newReports/SalesOverview';
 
 const OtherNewReports = () => {
   // For PDF Download
@@ -114,7 +115,7 @@ const OtherNewReports = () => {
         <RevenueDistribution />
         <RevenueAndIndustriGraph />
         <CategoryWiseReport />
-        <MediaWiseReport />
+        <SalesOverview />
       </div>
       <div className="border-2 p-5 border-black my-2">
         <p className="font-bold text-lg"> Trends </p>
@@ -135,7 +136,7 @@ const OtherNewReports = () => {
         <PriceTradedMargin />
       </div>
 
-      <InvoiceAmountCollReport />
+      {/* <InvoiceAmountCollReport />
 
       <div className="overflow-y-auto px-5 col-span-10 w-[65rem]">
         <p className="font-bold pt-10">Performance Ranking Report</p>
@@ -149,7 +150,7 @@ const OtherNewReports = () => {
       <OrderDetails />
       <ProposalDetails />
       <RevenueBreakup />
-      <CampaignCards />
+      <CampaignCards /> */}
     </div>
   );
 };
