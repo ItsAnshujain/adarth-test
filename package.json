@@ -47,6 +47,7 @@
     "@tanstack/react-query": "^4.3.9",
     "@tanstack/react-query-devtools": "^4.3.9",
     "chart.js": "^3.9.1",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-zoom": "^2.0.1",
     "classnames": "^2.3.2",
     "date-fns": "^3.6.0",
