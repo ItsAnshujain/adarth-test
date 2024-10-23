@@ -73,7 +73,7 @@ const RevenueBreakup = () => {
   // revenue breakup according to client type
 
   return (
-    <div className="p-5">
+    <div  className={`${!isLoadingBookingData?"loading_completed":""} p-5`}>
         <div className="flex justify-between gap-4 flex-wrap">
           <div className="flex gap-4 p-4 border rounded-md items-center" id="Revenue_breakup">
             <div className="w-32">
