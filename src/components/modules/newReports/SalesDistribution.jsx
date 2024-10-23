@@ -293,8 +293,8 @@ const SalesDistribution = () => {
   );
   return (
     <div className="flex p-6 flex-col">
-      <div>
-        <div className="flex justify-between items-center">
+      <div id="Sales_distribution">
+        <div className="flex justify-between items-center" >
           <p className="font-bold">Monthly Sales Distribution</p>
         </div>
         <p className="text-sm text-gray-600 italic pt-3">
@@ -317,7 +317,7 @@ const SalesDistribution = () => {
           </div>
         )}
       </div>
-      <div className="mt-10">
+      <div className="mt-10" id="Percentage_contribution">
         <div className="flex justify-between items-center">
           <p className="font-bold">Monthly Percentage Contribution</p>
         </div>

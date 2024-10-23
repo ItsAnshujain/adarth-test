@@ -8,12 +8,12 @@ import { useDistinctAdditionalTags } from '../../../apis/queries/inventory.queri
 import classNames from 'classnames';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 import { useBookings, useBookingsNew } from '../../../apis/queries/booking.queries';
-import Table from '../../Table/Table';
 import { useFetchMasters } from '../../../apis/queries/masters.queries';
 import { generateSlNo, serialize } from '../../../utils';
 import { Link } from 'react-router-dom';
 import toIndianCurrency from '../../../utils/currencyFormat';
 import { DATE_FORMAT } from '../../../utils/constants';
+import Table1 from '../../Table/Table1';
 
 const CampaignDetails = () => {
   const [searchParams] = useSearchParams({
@@ -26,8 +26,8 @@ const CampaignDetails = () => {
   const { data: bookingData, isLoading: isLoadingBookingData } = useBookings(
     searchParams.toString(),
   );
- // existing campagin details
- const { data: campaignStatus } = useFetchMasters(
+  // existing campagin details
+  const { data: campaignStatus } = useFetchMasters(
     serialize({
       type: 'booking_campaign_status',
       parentId: null,
@@ -184,29 +184,29 @@ const CampaignDetails = () => {
   // existing campagin details
 
   return (
-   <>
-   <div className="flex flex-col col-span-10 overflow-hidden">
-          <div className="py-6 w-[50rem] ml-8">
-            <p className="font-bold ">Campaign Details</p>
-          </div>
+    <div id='Campaign_details'>
+      <div className="flex flex-col overflow-hidden px-5">
+        <div className="py-6 w-[50rem]">
+          <p className="font-bold ">Campaign Details</p>
         </div>
-        <div className="ml-8 col-span-12 md:col-span-12 lg:col-span-10 border-l border-gray-450 h-[400px] overflow-auto">
-          <Table
-            data={sortedBookingData} // Use manually sorted data
-            COLUMNS={column5}
-            loading={isLoadingBookingData}
-            showPagination={false}
-            initialState={{
-              sortBy: [
-                {
-                  id: 'campaign.totalPrice',
-                  desc: true,
-                },
-              ],
-            }}
-          />
-        </div>
-   </>
+      </div>
+      <div className="px-5 col-span-12 md:col-span-12 lg:col-span-10 border-gray-450  overflow-auto">
+        <Table1
+          data={sortedBookingData} // Use manually sorted data
+          COLUMNS={column5}
+          loading={isLoadingBookingData}
+          showPagination={false}
+          initialState={{
+            sortBy: [
+              {
+                id: 'campaign.totalPrice',
+                desc: true,
+              },
+            ],
+          }}
+        />
+      </div>
+    </div>
   );
 };
 

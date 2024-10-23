@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Button, } from '@mantine/core';
+import { Menu, Button } from '@mantine/core';
 import DateRangeSelector from '../../../components/DateRangeSelector';
 import classNames from 'classnames';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
@@ -72,7 +72,7 @@ const RevenueDistribution = () => {
   const { data: bookingData, isLoading: isLoadingBookingData } = useBookings(
     searchParams.toString(),
   );
- 
+
   const [filter, setFilter] = useState('currentYear');
   const [activeView, setActiveView] = useState('currentYear');
 
@@ -363,54 +363,52 @@ const RevenueDistribution = () => {
     setEndDate2(null);
   };
   return (
-    <div className="p-6 w-[50rem]">
-          <p className="font-bold ">Revenue Distribution</p>
-          <p className="text-sm text-gray-600 italic py-4">
-            This line chart shows revenue trends over selected time periods, with revenue displayed
-            in lakhs.
-          </p>
-          <Menu shadow="md" width={130}>
-            <Menu.Target>
-              <Button className="secondary-button">
-                View By: {viewBy[activeView] || 'Select'}
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {list.map(({ label, value }) => (
-                <Menu.Item
-                  key={value}
-                  onClick={() => handleMenuItemClick(value)}
-                  className={classNames(
-                    activeView === value && label !== 'Reset' && 'text-purple-450 font-medium',
-                  )}
-                >
-                  {label}
-                </Menu.Item>
-              ))}
-            </Menu.Dropdown>
-          </Menu>
+    <div className="p-6 w-[50rem]" id="Revenue_distribution">
+      <p className="font-bold ">Revenue Distribution</p>
+      <p className="text-sm text-gray-600 italic py-4">
+        This line chart shows revenue trends over selected time periods, with revenue displayed in
+        lakhs.
+      </p>
+      <Menu shadow="md" width={130}>
+        <Menu.Target>
+          <Button className="secondary-button">View By: {viewBy[activeView] || 'Select'}</Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          {list.map(({ label, value }) => (
+            <Menu.Item
+              key={value}
+              onClick={() => handleMenuItemClick(value)}
+              className={classNames(
+                activeView === value && label !== 'Reset' && 'text-purple-450 font-medium',
+              )}
+            >
+              {label}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
 
-          {filter && (
-            <Button onClick={handleReset} className="mx-2 secondary-button">
-              Reset
-            </Button>
-          )}
+      {filter && (
+        <Button onClick={handleReset} className="mx-2 secondary-button">
+          Reset
+        </Button>
+      )}
 
-          {filter === 'customDate' && (
-            <div className="flex flex-col items-start space-y-4 py-2 ">
-              <DateRangeSelector dateValue={[startDate2, endDate2]} onChange={onDateChange} />
-            </div>
-          )}
-
-          <div className="my-4">
-            <Line
-              data={chartData1}
-              options={chartOptions1}
-              ref={chartRef}
-              plugins={[ChartDataLabels]}
-            />
-          </div>
+      {filter === 'customDate' && (
+        <div className="flex flex-col items-start space-y-4 py-2 ">
+          <DateRangeSelector dateValue={[startDate2, endDate2]} onChange={onDateChange} />
         </div>
+      )}
+
+      <div className="my-4">
+        <Line
+          data={chartData1}
+          options={chartOptions1}
+          ref={chartRef}
+          plugins={[ChartDataLabels]}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -18,6 +18,7 @@ import {
 } from 'chart.js';
 import { useBookingsNew } from '../../../apis/queries/booking.queries';
 import Table from '../../Table/Table';
+import Table1 from '../../Table/Table1';
 
 ChartJS.register(
   ArcElement,
@@ -30,16 +31,16 @@ ChartJS.register(
   Title,
   LogarithmicScale,
 );
-  const viewBy2 = {
-    reset: '',
-    newInclusion: 'New Inclusion',
-    oldRetention: 'Old Retention',
-  };
-  
-  const list2 = [
-    { label: 'New Inclusion', value: 'newInclusion' },
-    { label: 'Old Retention', value: 'oldRetention' },
-  ];
+const viewBy2 = {
+  reset: '',
+  newInclusion: 'New Inclusion',
+  oldRetention: 'Old Retention',
+};
+
+const list2 = [
+  { label: 'New Inclusion', value: 'newInclusion' },
+  { label: 'Old Retention', value: 'oldRetention' },
+];
 const ClientDetails = () => {
   const [searchParams] = useSearchParams({
     page: 1,
@@ -157,55 +158,55 @@ const ClientDetails = () => {
   // client details
 
   return (
-    <div className="flex flex-col col-span-10 overflow-x-hidden">
-          <div className="pt-10 w-[50rem] ml-8">
-            <p className="font-bold ">Client Details</p>
-            <p className="text-sm text-gray-600 italic py-4">
-              This report shows the client details based on retention status.
-            </p>
-            <div className="flex">
-              <div>
-                <Menu shadow="md" width={130}>
-                  <Menu.Target>
-                    <Button className="secondary-button">
-                      View By: {viewBy2[activeView2] || 'Retention Status'}
-                    </Button>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    {list2.map(({ label, value }) => (
-                      <Menu.Item
-                        key={value}
-                        onClick={() => handleMenuItemClick2(value)}
-                        className={
-                          activeView2 === value && label !== 'Reset'
-                            ? 'text-purple-450 font-medium'
-                            : ''
-                        }
-                      >
-                        {label}
-                      </Menu.Item>
-                    ))}
-                  </Menu.Dropdown>
-                </Menu>
-              </div>
-              <div>
-                {filter2 && (
-                  <Button onClick={handleReset2} className="mx-2 secondary-button">
-                    Reset
-                  </Button>
-                )}
-              </div>
-            </div>
+    <div className="flex flex-col col-span-10 overflow-x-hidden px-5" id='Client_details'>
+      <div className=" w-[50rem]">
+        <p className="font-bold ">Client Details</p>
+        <p className="text-sm text-gray-600 italic py-4">
+          This report shows the client details based on retention status.
+        </p>
+        <div className="flex">
+          <div>
+            <Menu shadow="md" width={130}>
+              <Menu.Target>
+                <Button className="secondary-button">
+                  View By: {viewBy2[activeView2] || 'Retention Status'}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                {list2.map(({ label, value }) => (
+                  <Menu.Item
+                    key={value}
+                    onClick={() => handleMenuItemClick2(value)}
+                    className={
+                      activeView2 === value && label !== 'Reset'
+                        ? 'text-purple-450 font-medium'
+                        : ''
+                    }
+                  >
+                    {label}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
+            </Menu>
           </div>
-          <div className="ml-8 my-5 col-span-12 md:col-span-12 lg:col-span-10 border-l border-gray-450 h-[400px] overflow-auto">
-            <Table
-              COLUMNS={tableColumns4}
-              data={tableData4}
-              loading={isLoadingBookingData}
-              showPagination={false}
-            />
+          <div>
+            {filter2 && (
+              <Button onClick={handleReset2} className="mx-2 secondary-button">
+                Reset
+              </Button>
+            )}
           </div>
         </div>
+      </div>
+      <div className=" mt-5 col-span-12 md:col-span-12 lg:col-span-10 border-gray-450 overflow-auto">
+        <Table1
+          COLUMNS={tableColumns4}
+          data={tableData4}
+          loading={isLoadingBookingData}
+          showPagination={false}
+        />
+      </div>
+    </div>
   );
 };
 

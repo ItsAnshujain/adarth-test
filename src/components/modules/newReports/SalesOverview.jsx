@@ -1,11 +1,10 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Menu, Button } from '@mantine/core';
-import classNames from 'classnames';
 import { useBookingsNew } from '../../../apis/queries/booking.queries';
 import DateRangeSelector from '../../DateRangeSelector';
-import Table from '../../Table/Table';
-
+import classNames from 'classnames';
+import { useTable } from 'react-table';
 const viewBy = {
   yearly: 'Yearly',
   halfYearly: 'Half Yearly',
@@ -120,15 +119,15 @@ const SalesOverview = () => {
 
   const prepareYearlyData = bookings => {
     const groupedData = {};
-
+  
     const clientTypes = ['Direct Client', 'Local Agency', 'National Agency', 'Government'];
-
+  
     const getFinancialYear = date => {
       const month = date.getMonth();
       const year = date.getFullYear();
       return month >= 3 ? year : year - 1;
     };
-
+  
     const getQuarter = monthIndex => {
       if (monthIndex >= 3 && monthIndex <= 5) {
         return 'First Quarter';
@@ -140,99 +139,75 @@ const SalesOverview = () => {
         return 'Fourth Quarter';
       }
     };
-
+  
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentFinYearStart = new Date(today.getFullYear(), 3, 1);
     const currentFinYearEnd = new Date(today.getFullYear() + 1, 2, 31);
-
+  
     const quarterlySummaries = {};
-
+  
     bookings.forEach(booking => {
       const createdAt = new Date(booking.createdAt);
-
+  
       if (createdAt > today) return;
-
+  
       const month = createdAt.getMonth();
       const year = getFinancialYear(createdAt);
       const clientType = booking?.client?.clientType || '-';
-
+  
       let periodKey = '';
       let groupingKey = '';
       const monthName = createdAt.toLocaleString('default', { month: 'long' });
-
+  
       switch (filter) {
         case 'yearly':
           if (createdAt < currentFinYearStart || createdAt > currentFinYearEnd) return;
-
+  
           const quarter = getQuarter(month);
           periodKey = `${monthName} ${year}`;
           groupingKey = `${month}-${year}`;
-
-          if (!quarterlySummaries[quarter]) {
-            quarterlySummaries[quarter] = {
-              ownedSiteRevenue: 0,
-              tradedSiteRevenue: 0,
-              totalRevenue: 0,
-              tradedMargin: 0,
-              clientType: '',
-              operationalCosts: { electricity: 0, licenseFee: 0, rental: 0, misc: 0 },
-              tradedPurchaseCost: 0,
-              grossRevenueOwned: 0,
-              grossRevenueTraded: 0,
-            };
-          }
           break;
-
+  
         case 'halfYearly': {
           if (createdAt < currentFinYearStart || createdAt > currentFinYearEnd) return;
-
-          const firstHalfStart = new Date(today.getFullYear(), 3, 1);
-          const firstHalfEnd = new Date(today.getFullYear(), 8, 30);
-          const secondHalfStart = new Date(today.getFullYear(), 9, 1);
-          const secondHalfEnd = new Date(today.getFullYear() + 1, 2, 31);
-
+  
+          // Define the first and second half of the financial year
+          const firstHalfStart = new Date(today.getFullYear(), 3, 1); // April 1
+          const firstHalfEnd = new Date(today.getFullYear(), 8, 30); // September 30
+          const secondHalfStart = new Date(today.getFullYear(), 9, 1); // October 1
+          const secondHalfEnd = new Date(today.getFullYear() + 1, 2, 31); // March 31 of next year
+  
+          // Check which half the current month falls into
           const isFirstHalf = currentMonth >= 3 && currentMonth <= 8;
           const isSecondHalf = currentMonth >= 9 || currentMonth <= 2;
-
-          let halfYear = '';
-          if (isFirstHalf && createdAt >= firstHalfStart && createdAt <= firstHalfEnd) {
-            halfYear = 'First Half';
-          } else if (isSecondHalf && createdAt >= secondHalfStart && createdAt <= secondHalfEnd) {
-            halfYear = 'Second Half';
+  
+          // Show only the current half where the current month lies
+          if (isFirstHalf) {
+            if (createdAt < firstHalfStart || createdAt > firstHalfEnd) return; // Ensure it's within first half dates
+          } else if (isSecondHalf) {
+            if (createdAt < secondHalfStart || createdAt > secondHalfEnd) return; // Ensure it's within second half dates
           } else {
-            return;
+            return; // If it's not within either half, return early
           }
-
+  
+          // Set periodKey and groupingKey
           periodKey = `${monthName} ${year}`;
           groupingKey = `${month}-${year}`;
-
-          const quarter = getQuarter(month);
-          if (!quarterlySummaries[quarter]) {
-            quarterlySummaries[quarter] = {
-              ownedSiteRevenue: 0,
-              tradedSiteRevenue: 0,
-              totalRevenue: 0,
-              tradedMargin: 0,
-              operationalCosts: { electricity: 0, licenseFee: 0, rental: 0, misc: 0 },
-              tradedPurchaseCost: 0,
-              grossRevenueOwned: 0,
-              grossRevenueTraded: 0,
-            };
-          }
+  
           break;
         }
-
+  
         case 'quarterly':
           periodKey = `${createdAt.toLocaleString('default', { month: 'long' })} ${year}`;
           groupingKey = `${getQuarter(month)}-${year}-${month}`;
           break;
-
+  
         case 'monthly':
           periodKey = `${createdAt.toLocaleString('default', { month: 'long' })} ${year}`;
           groupingKey = `${month}-${year}`;
           break;
-
+  
         case 'weekly': {
           const getWeekOfMonth = date => {
             const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -240,22 +215,22 @@ const SalesOverview = () => {
             const firstDayOfWeek = firstDayOfMonth.getDay();
             return Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
           };
-
+  
           const weekOfMonth = getWeekOfMonth(createdAt);
           periodKey = `Week ${weekOfMonth}, ${monthName} ${year}`;
           groupingKey = `week-${weekOfMonth}-${today.getMonth()}-${year}`;
           break;
         }
-
+  
         case 'customDate':
           periodKey = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
           groupingKey = `custom-${startDate}-${endDate}`;
           break;
-
+  
         default:
           periodKey = '-';
       }
-
+  
       if (!groupedData[groupingKey]) {
         groupedData[groupingKey] = {};
       }
@@ -278,20 +253,20 @@ const SalesOverview = () => {
           totalRevenue: 0,
         };
       }
-
+  
       let totalPrice = 0;
       let totalTradedAmount = 0;
       const totalAmount = booking.totalAmount || 0;
-
+  
       groupedData[groupingKey][clientType].totalRevenue += totalAmount / 100000;
-
+  
       const spaces = booking.details[0]?.campaign?.spaces || [];
-
+  
       if (Array.isArray(spaces)) {
         spaces.forEach(space => {
           totalTradedAmount += (space.tradedAmount || 0) / 100000;
           totalPrice += (space.basicInformation?.price || 0) / 100000;
-
+  
           if (totalTradedAmount === 0) {
             groupedData[groupingKey][clientType].ownedSiteRevenue += totalPrice;
             groupedData[groupingKey][clientType].grossRevenueOwned += totalPrice;
@@ -308,7 +283,7 @@ const SalesOverview = () => {
         booking.operationalCosts.forEach(cost => {
           const amount = (cost.amount || 0) / 100000;
           const typeName = cost.type?.name;
-
+  
           if (typeName) {
             switch (typeName) {
               case 'Electricity':
@@ -330,20 +305,16 @@ const SalesOverview = () => {
         });
       }
     });
-
+  
     const finalData = [];
     const orderedGroupingKeys = Object.keys(groupedData).sort((a, b) => {
       const aParts = a.split('-');
       const bParts = b.split('-');
       return parseInt(aParts[0]) - parseInt(bParts[0]) || aParts[1].localeCompare(bParts[1]);
     });
-    
-    let quarterTotals = {};
-    let currentQuarterIndex = -1; // Track the current quarter index (0: Q1, 1: Q2, 2: Q3, 3: Q4)
-    
-    orderedGroupingKeys.forEach((groupingKey, groupingIndex) => {
-      clientTypes.forEach((clientType) => {
-        // Create default entry if it doesn't exist
+  
+    orderedGroupingKeys.forEach(groupingKey => {
+      clientTypes.forEach(clientType => {
         if (!groupedData[groupingKey][clientType]) {
           groupedData[groupingKey][clientType] = {
             period: groupedData[groupingKey][Object.keys(groupedData[groupingKey])[0]].period,
@@ -363,125 +334,20 @@ const SalesOverview = () => {
             totalRevenue: '-',
           };
         }
-    
-        const currentData = groupedData[groupingKey][clientType];
-        finalData.push(currentData);
-    
-        // Determine the current quarter for the grouping key
-        const month = parseInt(groupingKey.split('-')[0]);
-        const quarterIndex = Math.floor((month - 1) / 3); // Determine the quarter index (0-3)
-    
-        if (quarterIndex !== currentQuarterIndex ) {
-          // If we're changing quarters, add a total row for the previous quarter
-          if (currentQuarterIndex !== -1) {
-            const totalRow = {
-              period: `Total for Q${currentQuarterIndex + 1}`,
-              clientType: 'Total',
-              ownedSiteRevenue: quarterTotals.ownedSiteRevenue,
-              tradedSiteRevenue: quarterTotals.tradedSiteRevenue,
-              operationalCosts: {
-                electricity: quarterTotals.operationalCosts.electricity,
-                licenseFee: quarterTotals.operationalCosts.licenseFee,
-                rental: quarterTotals.operationalCosts.rental,
-                misc: quarterTotals.operationalCosts.misc,
-              },
-              tradedPurchaseCost: quarterTotals.tradedPurchaseCost,
-              tradedMargin: quarterTotals.tradedMargin,
-              grossRevenueOwned: quarterTotals.grossRevenueOwned,
-              grossRevenueTraded: quarterTotals.grossRevenueTraded,
-              totalRevenue: quarterTotals.totalRevenue,
-            };
-            finalData.push(totalRow);
-          }
-    
-          // Reset totals for the new quarter
-          quarterTotals = {
-            ownedSiteRevenue: 0,
-            tradedSiteRevenue: 0,
-            operationalCosts: {
-              electricity: 0,
-              licenseFee: 0,
-              rental: 0,
-              misc: 0,
-            },
-            tradedPurchaseCost: 0,
-            tradedMargin: 0,
-            grossRevenueOwned: 0,
-            grossRevenueTraded: 0,
-            totalRevenue: 0,
-          };
-          currentQuarterIndex = quarterIndex; // Update to the new quarter
-        }
-    
-        // Update the totals for the current quarter
-        quarterTotals.ownedSiteRevenue += currentData.ownedSiteRevenue !== '-' ? Number(currentData.ownedSiteRevenue) : 0;
-        quarterTotals.tradedSiteRevenue += currentData.tradedSiteRevenue !== '-' ? Number(currentData.tradedSiteRevenue) : 0;
-        
-        // Check operationalCosts before summing
-        const operationalCosts = currentData.operationalCosts;
-        if (operationalCosts) {
-          quarterTotals.operationalCosts.electricity += operationalCosts.electricity !== '-' ? Number(operationalCosts.electricity) : 0;
-          quarterTotals.operationalCosts.licenseFee += operationalCosts.licenseFee !== '-' ? Number(operationalCosts.licenseFee) : 0;
-          quarterTotals.operationalCosts.rental += operationalCosts.rental !== '-' ? Number(operationalCosts.rental) : 0;
-          quarterTotals.operationalCosts.misc += operationalCosts.misc !== '-' ? Number(operationalCosts.misc) : 0;
-        }
-    
-        quarterTotals.tradedPurchaseCost += currentData.tradedPurchaseCost !== '-' ? Number(currentData.tradedPurchaseCost) : 0;
-        quarterTotals.tradedMargin += currentData.tradedMargin !== '-' ? Number(currentData.tradedMargin) : 0;
-        quarterTotals.grossRevenueOwned += currentData.grossRevenueOwned !== '-' ? Number(currentData.grossRevenueOwned) : 0;
-        quarterTotals.grossRevenueTraded += currentData.grossRevenueTraded !== '-' ? Number(currentData.grossRevenueTraded) : 0;
-        quarterTotals.totalRevenue += currentData.totalRevenue !== '-' ? Number(currentData.totalRevenue) : 0;
-    
-        // Add total row after last month of the quarter
-        const isLastMonthOfQuarter = (month + 1) % 3 === 0;
-        if (isLastMonthOfQuarter && clientType === clientTypes[clientTypes.length - 1]) {
-          const totalRow = {
-            period: `Total for Q${quarterIndex + 1}`,
-            clientType: 'Total',
-            ownedSiteRevenue: quarterTotals.ownedSiteRevenue.toFixed(2),
-            tradedSiteRevenue: quarterTotals.tradedSiteRevenue.toFixed(2),
-            operationalCosts: {
-              electricity: quarterTotals.operationalCosts.electricity.toFixed(2),
-              licenseFee: quarterTotals.operationalCosts.licenseFee.toFixed(2),
-              rental: quarterTotals.operationalCosts.rental.toFixed(2),
-              misc: quarterTotals.operationalCosts.misc.toFixed(2),
-            },
-            tradedPurchaseCost: quarterTotals.tradedPurchaseCost.toFixed(2),
-            tradedMargin: quarterTotals.tradedMargin.toFixed(2),
-            grossRevenueOwned: quarterTotals.grossRevenueOwned.toFixed(2),
-            grossRevenueTraded: quarterTotals.grossRevenueTraded.toFixed(2),
-            totalRevenue: quarterTotals.totalRevenue.toFixed(2),
-          };
-          finalData.push(totalRow);
-        }
+        finalData.push(groupedData[groupingKey][clientType]);
       });
     });
-    
-    // After processing all groups, add the total row for the last quarter
-    if (currentQuarterIndex !== -1) {
-      const totalRow = {
-        period: `Total for Q${currentQuarterIndex + 1}`,
-        clientType: 'Total',
-        ownedSiteRevenue: quarterTotals.ownedSiteRevenue.toFixed(2),
-        tradedSiteRevenue: quarterTotals.tradedSiteRevenue.toFixed(2),
-        operationalCosts: {
-          electricity: quarterTotals.operationalCosts.electricity.toFixed(2),
-          licenseFee: quarterTotals.operationalCosts.licenseFee.toFixed(2),
-          rental: quarterTotals.operationalCosts.rental.toFixed(2),
-          misc: quarterTotals.operationalCosts.misc.toFixed(2),
-        },
-        tradedPurchaseCost: quarterTotals.tradedPurchaseCost.toFixed(2),
-        tradedMargin: quarterTotals.tradedMargin.toFixed(2),
-        grossRevenueOwned: quarterTotals.grossRevenueOwned.toFixed(2),
-        grossRevenueTraded: quarterTotals.grossRevenueTraded.toFixed(2),
-        totalRevenue: quarterTotals.totalRevenue.toFixed(2),
-      };
-      finalData.push(totalRow);
-    }
+  
     return finalData.map((data, index, array) => {
       const previousData = array[index - 1];
-      const formatValue = value => (Number.isFinite(value) ? value.toFixed(2) : '-');
-
+  
+      const formatValue = value => {
+        if (!Number.isFinite(value) || value === 0) {
+          return '-';
+        }
+        return value.toFixed(2);
+      };
+  
       if (!previousData || previousData.period !== data.period) {
         return {
           ...data,
@@ -520,6 +386,7 @@ const SalesOverview = () => {
       }
     });
   };
+  
   const yearlyData = useMemo(() => {
     return prepareYearlyData(filteredData);
   }, [filteredData]);
@@ -541,83 +408,83 @@ const SalesOverview = () => {
     setActiveView(value);
   };
 
-  const tableSalesData = yearlyData;
+  const tableSalesData = yearlyData; // Your sales data
   const tableSalesColumns = useMemo(
     () => [
       {
-        Header: 'Period',
+        Header: 'PERIOD',
         accessor: 'period',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Client Type',
+        Header: 'CLIENT TYPE',
         accessor: 'clientType',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value || '-'}</p>,
       },
       {
-        Header: 'Owned Site Revenue',
+        Header: 'OWNED SITE REVENUE',
         accessor: 'ownedSiteRevenue',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Traded Site Revenue',
+        Header: 'TRADED SITE REVENUE',
         accessor: 'tradedSiteRevenue',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Operational Costs (Electricity)',
+        Header: 'OPERATIONAL COSTS (ELECTRICITY)',
         accessor: 'operationalCosts.electricity',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Operational Costs (License Fee)',
+        Header: 'OPERATIONAL COSTS (LICENSE FEE)',
         accessor: 'operationalCosts.licenseFee',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Operational Costs (Rental)',
+        Header: 'OPERATIONAL COSTS (RENTAL)',
         accessor: 'operationalCosts.rental',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Operational Costs (Misc)',
+        Header: 'OPERATIONAL COSTS (MISC)',
         accessor: 'operationalCosts.misc',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Traded Purchase Cost',
+        Header: 'TRADED PURCHASE COST',
         accessor: 'tradedPurchaseCost',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Traded Margin',
+        Header: 'TRADED MARGIN',
         accessor: 'tradedMargin',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Gross Revenue (Owned)',
+        Header: 'GROSS REVENUE (OWNED)',
         accessor: 'grossRevenueOwned',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Gross Revenue (Traded)',
+        Header: 'GROSS REVENUE (TRADED)',
         accessor: 'grossRevenueTraded',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
       },
       {
-        Header: 'Total Revenue',
+        Header: 'TOTAL REVENUE',
         accessor: 'totalRevenue',
         disableSortBy: true,
         Cell: ({ value }) => <p>{value}</p>,
@@ -626,9 +493,18 @@ const SalesOverview = () => {
     [],
   );
 
+  // Hook for table state
+  const tableInstance = useTable({
+    columns: tableSalesColumns,
+    data: tableSalesData,
+  });
+
+  // Destructure properties from tableInstance
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+
   return (
-    <div className="col-span-12 lg:col-span-10 border-gray-450 overflow-auto">
-      <div className="p-5 w-[50rem] ">
+    <div className="col-span-12 lg:col-span-10 border-gray-450 overflow-y-auto" id="Sales_overview">
+      <div className="p-5 w-[50rem]">
         <p className="font-bold pb-4">Sales Overview</p>
         <p className="text-sm text-gray-600 italic pb-4">
           This report summarizes sales performance across various metrics and timeframes
@@ -674,15 +550,74 @@ const SalesOverview = () => {
           </div>
         )}
       </div>
-      <div className=" h-[400px] overflow-auto px-5 ">
-        <Table
-          data={tableSalesData}
-          COLUMNS={tableSalesColumns}
-          showPagination={false}
-          loading={isLoadingBookingData}
-        />
+
+      {/* <div className="h-[400px] overflow-auto "> */}
+      <div className="flex flex-col justify-between px-5">
+        <div className="overflow-auto max-h-[400px]">
+          <table className="w-full">
+            <thead className="bg-gray-100 sticky top-0 z-10">
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(header => (
+                    <th
+                      className={classNames(
+                        'text-sm sticky top-0 z-10 bg-gray-100 text-center',
+                        'w-28',
+                      )}
+                      {...header.getHeaderProps()}
+                    >
+                      <div className="w-max flex align-center text-left pl-2 text-gray-400 hover:text-black py-2 text-xs font-medium">
+                        <div className="w-fit tracking-wide">{header.render('Header')}</div>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {rows.map((row, index) => {
+                prepareRow(row);
+
+                const isEndOfMonthGroup = (index + 1) % 4 === 0;
+                const rowBackgroundClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-200';
+
+                return (
+                  <React.Fragment key={index}>
+                    <tr
+                      className={classNames(
+                        'text-left border-l-0 hover:bg-slate-100',
+                        rowBackgroundClass,
+                        row.original?.peerId && row.original.peerId !== userId && 'has-peer',
+                        row.original.isActive === false ? 'opacity-50' : '',
+                        'table-row',
+                      )}
+                      {...row.getRowProps()}
+                    >
+                      {row.cells.map(cell => (
+                        <td className="p-2" {...cell.getCellProps()}>
+                          <div className="w-max">{cell.render('Cell')}</div>
+                        </td>
+                      ))}
+                    </tr>
+
+                    {isEndOfMonthGroup && (
+                      <tr>
+                        <td
+                          colSpan={headerGroups[0].headers.length}
+                          className="border-t-2 border-gray-500"
+                        ></td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {rows.length <= 0 ? <div className="mx-auto">No data available</div> : null}
       </div>
     </div>
+
   );
 };
 

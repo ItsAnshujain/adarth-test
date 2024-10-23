@@ -42,7 +42,7 @@ const PerformanceCard = () => {
         value: topSpaceByBookings?.totalBookings || 0,
         label: 'Bookings ',
         icon: OngoingOrdersIcon,
-         color:'#4C3BCF'
+        color: '#4C3BCF',
       },
     },
     {
@@ -52,7 +52,7 @@ const PerformanceCard = () => {
         value: leastSpaceByBookings?.totalBookings || 0,
         label: 'Bookings ',
         icon: InitiateDiscussionIcon,
-         color:'#FF7F3E'
+        color: '#FF7F3E',
       },
     },
     {
@@ -62,7 +62,7 @@ const PerformanceCard = () => {
         value: toIndianCurrency((topSpaceByRevenue?.revenue || 0) / 100000), // Convert to lacs
         label: 'Revenue (lac)',
         icon: TotalRevenueIcon,
-         color:'#059212'
+        color: '#059212',
       },
     },
     {
@@ -72,25 +72,27 @@ const PerformanceCard = () => {
         value: toIndianCurrency((leastSpaceByRevenue?.revenue || 0) / 100000), // Convert to lacs
         label: 'Revenue (lac)',
         icon: InProgressIcon,
-        color:'#7A1CAC'
+        color: '#7A1CAC',
       },
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-6" id="PerformanceCards">
       {cardData.map(({ title, data }) => (
         <div className="border rounded p-8 flex-1" key={title}>
           <Image src={data.icon} alt="icon" height={24} width={24} fit="contain" />
-          <Text className="my-2 text-sm font-semibold " >
-            {title}
-          </Text>
-          <Text size="sm" weight="200">{data.name}
+          <Text className="my-2 text-sm font-semibold ">{title}</Text>
+          <Text size="sm" weight="200">
+            {data.name}
           </Text>
           <Text size="sm" weight="200">
-  {data.label}: <span className="font-bold" style={{ color: data.color }}> {data.value}</span>
-</Text>
-
+            {data.label}:{' '}
+            <span className="font-bold" style={{ color: data.color }}>
+              {' '}
+              {data.value}
+            </span>
+          </Text>
         </div>
       ))}
     </div>

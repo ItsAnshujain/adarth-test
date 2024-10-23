@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
@@ -23,6 +23,7 @@ import {
 } from 'chart.js';
 import { useBookingsNew } from '../../../apis/queries/booking.queries';
 import Table from '../../Table/Table';
+import Table1 from '../../Table/Table1';
 
 ChartJS.register(
   ArcElement,
@@ -78,6 +79,7 @@ const TagwiseReport = () => {
   const { data: bookingData2, isLoading: isLoadingBookingData } = useBookingsNew(
     searchParams.toString(),
   );
+  const chartRef = useRef(null); // Reference to the chart instance
 
   const additionalTagsQuery = useDistinctAdditionalTags();
   const [selectedTags, setSelectedTags] = useState(['best', 'ASTC']);
@@ -926,8 +928,8 @@ const TagwiseReport = () => {
   // tagwise report
 
   return (
-    <div className="col-span-10 overflow-y-auto overflow-hidden">
-      <div className="pt-6 w-[50rem] mx-10">
+    <div className="col-span-12 lg:col-span-10 border-gray-450 overflow-y-auto" id="Tagfilter_distribution">
+      <div className="p-5 w-[50rem]">
         <p className="font-bold "> Additional Filter Distribution</p>
         <p className="text-sm text-gray-600 italic py-4">
           This line chart displays the{' '}
@@ -1010,11 +1012,13 @@ const TagwiseReport = () => {
           <Line
             data={activeView5 === 'revenue' ? chartDataRevenue : chartDataProfitability}
             options={activeView5 === 'revenue' ? chartOptionsRevenue : chartOptionsProfitability}
+            ref={chartRef}
+            plugins={[ChartDataLabels]}
           />
         </div>
       </div>
-      <div className="col-span-12 lg:col-span-10 border-gray-450 mx-10  h-[300px] overflow-y-auto">
-        <Table
+      <div className="px-5 col-span-12 md:col-span-12 lg:col-span-10 border-gray-450 overflow-auto">
+        <Table1
           COLUMNS={activeView5 === 'revenue' ? tableColumnsRevenue : tableColumnsProfitability}
           data={activeView5 === 'revenue' ? tableDataRevenue : tableDataProfitability}
           showPagination={false}

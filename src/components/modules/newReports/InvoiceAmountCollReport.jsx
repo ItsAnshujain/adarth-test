@@ -273,7 +273,7 @@ const InvoiceAmountCollReport = () => {
   // invoice report
 
   return (
-    <div className="col-span-12 md:col-span-12 lg:col-span-10 p-5 overflow-hidden">
+    <div className="col-span-12 md:col-span-12 lg:col-span-10 p-5 overflow-hidden" id="invoice_report">
       <p className="font-bold ">Invoice and amount collected Report</p>
       <p className="text-sm text-gray-600 italic py-4">
         This report provide insights into the invoice raised, amount collected and outstanding by

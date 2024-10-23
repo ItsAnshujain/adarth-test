@@ -1,5 +1,5 @@
-import { useMemo, useRef} from 'react';
-import {  Doughnut } from 'react-chartjs-2';
+import { useMemo, useRef } from 'react';
+import { Doughnut } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -68,7 +68,7 @@ const customLinesPlugin = {
 };
 const PrintingMountingCosts = () => {
   const chartRef = useRef(null); // Reference to the chart instance
-  
+
   const { data: operationalCostData, isLoading: isStatsLoading } = useFetchOperationalCostData();
 
   const costData = useMemo(() => {
@@ -120,7 +120,7 @@ const PrintingMountingCosts = () => {
     }),
     [costData], // Add costData as a dependency
   );
-  
+
   const config1 = {
     options: {
       responsive: true,
@@ -165,96 +165,95 @@ const PrintingMountingCosts = () => {
     },
   };
   return (
-    <div className="px-5">
-    <div className="mb-4 flex flex-col">
-      <p className="font-bold">Printing & Mounting Costs</p>
-      <p className="text-sm text-gray-600 italic py-4">
-        This chart compares costs for printing, mounting, reprinting, and remounting
-        activities.
-      </p>
-    </div>
+    <div className="px-5" id='printingMounting_cards'>
+      <div className="mb-4 flex flex-col">
+        <p className="font-bold">Printing & Mounting Costs</p>
+        <p className="text-sm text-gray-600 italic py-4">
+          This chart compares costs for printing, mounting, reprinting, and remounting activities.
+        </p>
+      </div>
 
-    <div className="flex w-1/3 gap-4 h-[200px] ">
-      <div className="flex gap-4 p-4 border rounded-md items-center min-h-[200px]">
-        <div className="w-32">
-          {isStatsLoading ? (
-            <Loader className="mx-auto" />
-          ) : costData.Printing === 0 && costData.Mounting === 0 ? (
-            <p className="text-center">NA</p>
-          ) : (
-            <Doughnut
-              options={config1.options}
-              data={printingMountingData}
-              ref={chartRef}
-              plugins={[ChartDataLabels, customLinesPlugin]}
-            />
-          )}
-        </div>
-        <div>
-          <div className="flex gap-8 mt-6 flex-wrap">
-            <div className="flex gap-2 items-center">
-              <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
-              <div>
-                <p className="my-2 text-xs font-light text-slate-400">Printing</p>
-                <p className="font-bold text-md">
-                  {(costData.Printing / 100000).toFixed(2) ?? 0} L
-                </p>
+      <div className="flex w-1/3 gap-4 h-[200px] ">
+        <div className="flex gap-4 p-4 border rounded-md items-center min-h-[200px]">
+          <div className="w-32">
+            {isStatsLoading ? (
+              <Loader className="mx-auto" />
+            ) : costData.Printing === 0 && costData.Mounting === 0 ? (
+              <p className="text-center">NA</p>
+            ) : (
+              <Doughnut
+                options={config1.options}
+                data={printingMountingData}
+                ref={chartRef}
+                plugins={[ChartDataLabels, customLinesPlugin]}
+              />
+            )}
+          </div>
+          <div>
+            <div className="flex gap-8 mt-6 flex-wrap">
+              <div className="flex gap-2 items-center">
+                <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
+                <div>
+                  <p className="my-2 text-xs font-light text-slate-400">Printing</p>
+                  <p className="font-bold text-md">
+                    {(costData.Printing / 100000).toFixed(2) ?? 0} L
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
+                <div>
+                  <p className="my-2 text-xs font-light text-slate-400">Mounting</p>
+                  <p className="font-bold text-md">
+                    {(costData.Mounting / 100000).toFixed(2) ?? 0} L
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2 items-center">
-              <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
-              <div>
-                <p className="my-2 text-xs font-light text-slate-400">Mounting</p>
-                <p className="font-bold text-md">
-                  {(costData.Mounting / 100000).toFixed(2) ?? 0} L
-                </p>
+          </div>
+        </div>
+
+        {/* Reprinting & Remounting Revenue Split */}
+        <div className="flex gap-4 p-4 border rounded-md items-center min-h-[200px]">
+          <div className="w-32">
+            {isStatsLoading ? (
+              <Loader className="mx-auto" />
+            ) : costData.Remounting === 0 && costData.Reprinting === 0 ? (
+              <p className="text-center">NA</p>
+            ) : (
+              <Doughnut
+                options={config1.options}
+                data={reprintingRemountingData}
+                ref={chartRef}
+                plugins={[ChartDataLabels, customLinesPlugin]}
+              />
+            )}
+          </div>
+          <div>
+            <div className="flex gap-8 mt-6 flex-wrap">
+              <div className="flex gap-2 items-center">
+                <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
+                <div>
+                  <p className="my-2 text-xs font-light text-slate-400">Reprinting</p>
+                  <p className="font-bold text-md">
+                    {(costData.Reprinting / 100000).toFixed(2) ?? 0} L
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
+                <div>
+                  <p className="my-2 text-xs font-light text-slate-400">Remounting</p>
+                  <p className="font-bold text-md">
+                    {(costData.Remounting / 100000).toFixed(2) ?? 0} L
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Reprinting & Remounting Revenue Split */}
-      <div className="flex gap-4 p-4 border rounded-md items-center min-h-[200px]">
-        <div className="w-32">
-          {isStatsLoading ? (
-            <Loader className="mx-auto" />
-          ) : costData.Remounting === 0 && costData.Reprinting === 0 ? (
-            <p className="text-center">NA</p>
-          ) : (
-            <Doughnut
-              options={config1.options}
-              data={reprintingRemountingData}
-              ref={chartRef}
-              plugins={[ChartDataLabels, customLinesPlugin]}
-            />
-          )}
-        </div>
-        <div>
-          <div className="flex gap-8 mt-6 flex-wrap">
-            <div className="flex gap-2 items-center">
-              <div className="h-2 w-1 p-2 bg-orange-350 rounded-full" />
-              <div>
-                <p className="my-2 text-xs font-light text-slate-400">Reprinting</p>
-                <p className="font-bold text-md">
-                  {(costData.Reprinting / 100000).toFixed(2) ?? 0} L
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 items-center">
-              <div className="h-2 w-1 p-2 rounded-full bg-purple-350" />
-              <div>
-                <p className="my-2 text-xs font-light text-slate-400">Remounting</p>
-                <p className="font-bold text-md">
-                  {(costData.Remounting / 100000).toFixed(2) ?? 0} L
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
   );
 };
 

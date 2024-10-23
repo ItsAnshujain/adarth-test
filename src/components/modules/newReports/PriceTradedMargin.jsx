@@ -4,25 +4,21 @@ import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
 import { Menu, Button, MultiSelect, Text } from '@mantine/core';
 import DateRangeSelector from '../../../components/DateRangeSelector';
-import { useDistinctAdditionalTags, useFetchInventory } from '../../../apis/queries/inventory.queries';
-import classNames from 'classnames';
-import quarterOfYear from 'dayjs/plugin/quarterOfYear';
-import { useBookings, useBookingsNew } from '../../../apis/queries/booking.queries';
-import Table from '../../Table/Table';
-import { useFetchMasters } from '../../../apis/queries/masters.queries';
+import {
+  useDistinctAdditionalTags,
+  useFetchInventory,
+} from '../../../apis/queries/inventory.queries';
 import { generateSlNo, serialize } from '../../../utils';
-import { Link } from 'react-router-dom';
-import toIndianCurrency from '../../../utils/currencyFormat';
-import { DATE_FORMAT } from '../../../utils/constants';
+import Table1 from '../../Table/Table1';
 
 const PriceTradedMargin = () => {
-    const [searchParams3, setSearchParams3] = useSearchParams({
-        page: 1,
-        limit: 500,
-        sortBy: 'basicInformation.spaceName',
-        sortOrder: 'desc',
-        isActive: true,
-      });
+  const [searchParams3, setSearchParams3] = useSearchParams({
+    page: 1,
+    limit: 500,
+    sortBy: 'basicInformation.spaceName',
+    sortOrder: 'desc',
+    isActive: true,
+  });
 
   const { data: inventoryData, isLoading: isLoadingInventoryData } = useFetchInventory(
     searchParams3.toString(),
@@ -124,21 +120,21 @@ const PriceTradedMargin = () => {
 
   // traded margin report
   return (
-    <div className="col-span-12 md:col-span-12 lg:col-span-10 overflow-y-auto p-5">
-    <p className="font-bold">Price and Traded Margin Report</p>
-    <p className="text-sm text-gray-600 italic py-4">
-      This report provide insights into the pricing trends, traded prices, and margins grouped
-      by cities. (Amounts in Lacs)
-    </p>
-    <div className="overflow-y-auto h-[400px]">
-      <Table
-        data={processedData || []}
-        COLUMNS={columns3}
-        loading={isLoadingInventoryData}
-        showPagination={false}
-      />
+    <div className="col-span-12 md:col-span-12 lg:col-span-10 overflow-y-auto p-5" id="TradedMargin_report">
+      <p className="font-bold">Price and Traded Margin Report</p>
+      <p className="text-sm text-gray-600 italic py-4">
+        This report provide insights into the pricing trends, traded prices, and margins grouped by
+        cities. (Amounts in Lacs)
+      </p>
+      <div className="overflow-y-auto">
+        <Table1
+          data={processedData || []}
+          COLUMNS={columns3}
+          loading={isLoadingInventoryData}
+          showPagination={false}
+        />
+      </div>
     </div>
-  </div>
   );
 };
 

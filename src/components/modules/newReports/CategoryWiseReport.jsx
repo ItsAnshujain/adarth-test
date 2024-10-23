@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Button, } from '@mantine/core';
+import { Menu, Button } from '@mantine/core';
 import DateRangeSelector from '../../DateRangeSelector';
 import classNames from 'classnames';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
@@ -304,82 +304,77 @@ const CategoryWiseReport = () => {
     setActiveView4(value);
   };
   return (
-    <div className="flex flex-col md:flex-row  w-[60rem] px-4">
-    <div className="pt-6 w-[40rem]">
-      <p className="font-bold "> Category Wise Distribution</p>
-      <p className="text-sm text-gray-600 italic py-4">
-        This chart displays revenue data over different time periods, filtered by category of
-        inventory.
-      </p>
-      <div className="flex">
-        <div>
-          <Menu shadow="md" width={130}>
-            <Menu.Target>
-              <Button className="secondary-button">
-                View By: {viewBy[activeView4] || 'Select'}
+      <div className="pt-6 w-[40rem]" id="Category_distribution">
+        <p className="font-bold "> Category Wise Distribution</p>
+        <p className="text-sm text-gray-600 italic py-4">
+          This chart displays revenue data over different time periods, filtered by category of
+          inventory.
+        </p>
+        <div className="flex">
+          <div>
+            <Menu shadow="md" width={130}>
+              <Menu.Target>
+                <Button className="secondary-button">
+                  View By: {viewBy[activeView4] || 'Select'}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                {list.map(({ label, value }) => (
+                  <Menu.Item
+                    key={value}
+                    onClick={() => handleMenuItemClick4(value)}
+                    className={classNames(activeView4 === value && 'text-purple-450 font-medium')}
+                  >
+                    {label}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
+            </Menu>
+          </div>
+          <div className="mx-2">
+            <Menu shadow="md" width={130}>
+              <Menu.Target>
+                <Button className="secondary-button">
+                  {selectedCategory ? `Category: ${selectedCategory}` : 'Select Category'}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                {categoryList.map(category => (
+                  <Menu.Item key={category} onClick={() => setSelectedCategory(category)}>
+                    {category}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
+            </Menu>
+          </div>
+          <div>
+            {filter4 && (
+              <Button onClick={handleReset4} className="mx-2 secondary-button">
+                Reset
               </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {list.map(({ label, value }) => (
-                <Menu.Item
-                  key={value}
-                  onClick={() => handleMenuItemClick4(value)}
-                  className={classNames(
-                    activeView4 === value && 'text-purple-450 font-medium',
-                  )}
-                >
-                  {label}
-                </Menu.Item>
-              ))}
-            </Menu.Dropdown>
-          </Menu>
+            )}
+          </div>
         </div>
-        <div className="mx-2">
-          <Menu shadow="md" width={130}>
-            <Menu.Target>
-              <Button className="secondary-button">
-                {selectedCategory ? `Category: ${selectedCategory}` : 'Select Category'}
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {categoryList.map(category => (
-                <Menu.Item key={category} onClick={() => setSelectedCategory(category)}>
-                  {category}
-                </Menu.Item>
-              ))}
-            </Menu.Dropdown>
-          </Menu>
-        </div>
-        <div>
-          {filter4 && (
-            <Button onClick={handleReset4} className="mx-2 secondary-button">
-              Reset
-            </Button>
-          )}
-        </div>
-      </div>
-      {filter4 === 'customDate' && (
-        <div className="flex flex-col items-start space-y-4 py-2 ">
-          <DateRangeSelector
-            dateValue={[startDate1, endDate1]}
-            onChange={onDateChange4}
-            minDate={threeMonthsAgo}
-            maxDate={today}
+        {filter4 === 'customDate' && (
+          <div className="flex flex-col items-start space-y-4 py-2 ">
+            <DateRangeSelector
+              dateValue={[startDate1, endDate1]}
+              onChange={onDateChange4}
+              minDate={threeMonthsAgo}
+              maxDate={today}
+            />
+          </div>
+        )}
+
+        <div className=" my-4">
+          <Bar
+            ref={chartRef}
+            plugins={[ChartDataLabels]}
+            data={chartData4}
+            options={chartOptions4}
           />
         </div>
-      )}
-
-      <div className=" my-4">
-        <Bar
-          ref={chartRef}
-          plugins={[ChartDataLabels]}
-          data={chartData4}
-          options={chartOptions4}
-        />
-      </div>
     </div>
-  </div>
-
   );
 };
 

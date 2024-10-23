@@ -46,7 +46,7 @@ const config = {
  
 
   return (
-     <div className="px-5">
+     <div className="px-5" id='Campaign_cards'>
         <p className="font-bold py-4">Campaigns stats report</p>
         <div className="flex w-1/3 gap-4 h-[250px] ">
           <div className="flex gap-4 p-4 border rounded-md items-center min-h-[200px]">

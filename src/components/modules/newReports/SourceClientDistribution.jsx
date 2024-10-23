@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar, Doughnut, Pie } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import { useSearchParams } from 'react-router-dom';
 import { Loader } from '@mantine/core';
@@ -94,7 +94,6 @@ const barDataConfigByClient = {
     },
   },
 };
-
 const clientTypeLabels = {
   government: 'Government',
   nationalagency: 'National Agency',
@@ -108,70 +107,83 @@ const SourceClientDistribution = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
-  const userId = useUserStore(state => state.id);
-  const userSales = useUserSalesByUserId({
-    startDate: financialStartDate,
-    endDate: financialEndDate,
-    userId,
-  });
 
-  const chartRef = useRef(null); // Reference to the chart instance
+  const chartRef = useRef(null);
 
-  const { data: bookingData2, isLoading: isLoadingBookingData } = useBookingsNew(
+  const { data: bookingData, isLoading: isLoadingBookingData } = useBookingsNew(
     searchParams.toString(),
   );
-  const dummyStats = {
-    tradedsite: (userSales.data?.totalTradedAmount / 100000).toFixed(2) || 0,
-    ownsite: (userSales.data?.ownSiteSales / 100000).toFixed(2) || 0,
+
+  // Calculate Own and Traded Site Revenues
+  const calculateSiteRevenues = bookingData => {
+    let ownSiteRevenue = 0;
+    let tradedSiteRevenue = 0;
+
+    bookingData?.forEach(booking => {
+      booking.details.forEach(detail => {
+        detail.campaign.spaces.forEach(space => {
+          if (space.tradedAmount === 0) {
+            ownSiteRevenue += space.totalPrice || 0;
+          } else {
+            tradedSiteRevenue += space.totalPrice || 0;
+          }
+        });
+      });
+    });
+    return {
+      ownSiteRevenue: (ownSiteRevenue / 100000).toFixed(2), // Convert to lac and format to 2 decimal places
+      tradedSiteRevenue: (tradedSiteRevenue / 100000).toFixed(2), // Convert to lac and format to 2 decimal places
+    };
   };
+
+  const { ownSiteRevenue, tradedSiteRevenue } = useMemo(
+    () => calculateSiteRevenues(bookingData),
+    [bookingData],
+  );
 
   const printSitesData = useMemo(
     () => ({
+      labels: ['Own Sites', 'Traded Sites'], // Chart labels for the legend
       datasets: [
         {
-          data: [dummyStats.tradedsite, dummyStats.ownsite],
-          backgroundColor: ['#914EFB', '#FF900E'],
-          borderColor: ['#914EFB', '#FF900E'],
+          data: [ownSiteRevenue, tradedSiteRevenue],
+          backgroundColor: ['#FF900E', '#914EFB'], // Own Sites = Orange, Traded Sites = Purple
+          borderColor: ['#FF900E', '#914EFB'],
           borderWidth: 1,
         },
       ],
     }),
-    [dummyStats.tradedsite, dummyStats.ownsite],
+    [ownSiteRevenue, tradedSiteRevenue],
   );
   const config = {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // radius: '80%',
       plugins: {
         datalabels: {
-          color: '#333',
           formatter: value => {
-            return `${value}L`; // Append 'L' to the value
+            return value >= 1 ? Math.floor(value) : value.toFixed(1);
           },
+          color: '#000',
           anchor: 'end',
           align: 'end',
-          offset: 20,
+          offset: 2,
+          // This keeps the data labels unaffected by chart size adjustments
         },
-        customLines: true, // Custom lines plugin activation
       },
       layout: {
         padding: {
-          top: 70,
-          bottom: 70,
+          // top: 10,
+          bottom: 20,
+          left: 15,
+          right: 15,
         },
       },
-      elements: {
-        arc: {
-          borderWidth: 1,
-        },
-      },
-      cutout: '65%', // Doughnut cutout
     },
   };
-  const showOwnSites = dummyStats.ownsite > 0;
-  const showTradedSites = dummyStats.tradedsite > 0;
   const aggregatedData = useMemo(() => {
-    if (!bookingData2) return {};
+    if (!bookingData) return {};
 
     const validClientTypes = Object.keys(clientTypeLabels);
 
@@ -182,7 +194,7 @@ const SourceClientDistribution = () => {
       directclient: 0,
     };
 
-    bookingData2.forEach(booking => {
+    bookingData.forEach(booking => {
       const totalAmount = booking?.totalAmount || 0;
 
       if (Array.isArray(booking.details) && booking.details.length > 0) {
@@ -200,7 +212,7 @@ const SourceClientDistribution = () => {
     });
 
     return result;
-  }, [bookingData2]);
+  }, [bookingData]);
 
   const pieChartData = useMemo(() => {
     const labels = Object.keys(aggregatedData).map(clientType => clientTypeLabels[clientType]); // Use the mapping for labels
@@ -221,77 +233,58 @@ const SourceClientDistribution = () => {
   const [updatedClient, setUpdatedClient] = useState(pieChartData);
 
   useEffect(() => {
-    if (bookingData2) {
+    if (bookingData) {
       setUpdatedClient(pieChartData);
     }
-  }, [pieChartData, bookingData2]);
+  }, [pieChartData, bookingData]);
   return (
     <div className="flex flex-col md:flex-row">
-    <div className="flex flex-col p-6 w-[30rem] gap-4">
-      <p className="font-bold">Source Distribution</p>
-      <p className="text-sm text-gray-600 italic">
-        This chart shows the revenue split between "Own Sites" and "Traded Sites".
-      </p>
-      {!showOwnSites && !showTradedSites ? (
-        <p className="text-center">NA</p>
-      ) : (
-        <>
-          <div className="flex gap-8 mt-6 justify-center">
-            {showOwnSites && (
-              <div className="flex gap-2 items-center">
-                <div className="h-4 w-4 rounded-full bg-orange-350" />
-                <div>
-                  <p className="my-2 text-xs font-light">Own Sites</p>
-                  <p className="text-sm">{dummyStats.ownsite} L</p>
-                </div>
-              </div>
-            )}
-            {showTradedSites && (
-              <div className="flex gap-2 items-center">
-                <div className="h-4 w-4 rounded-full bg-purple-350" />
-                <div>
-                  <p className="my-2 text-xs font-light">Traded Sites</p>
-                  <p className="text-sm">{dummyStats.tradedsite} L</p>
-                </div>
-              </div>
-            )}
-          </div>
-          {showOwnSites || showTradedSites ? (
-            <div className="w-[200px] m-6">
-              <Doughnut options={config} data={printSitesData} plugins={[ChartDataLabels]} />
+      <div className="flex flex-col p-6  min-h-[200px] gap-4">
+        <p className="font-bold">Source Distribution</p>
+        <p className="text-sm text-gray-600 italic">
+          This chart shows the revenue split between "Own Sites" and "Traded Sites".
+        </p>
+        <div className=" " id="Source_Distribution">
+          {isLoadingBookingData ? (
+            <Loader className="mx-auto" />
+          ) : (
+            <Doughnut
+              options={config.options}
+              data={printSitesData}
+              ref={chartRef}
+              plugins={[ChartDataLabels, customLinesPlugin]}
+            />
+          )}
+        </div>
+      </div>
+      <div className="flex mt-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 p-4  min-h-[200px]">
+            <p className="font-bold">Client Type Distribution</p>
+            <p className="text-sm text-gray-600 italic">
+              This chart breaks down revenue by client type, including "Direct Clients", "Local
+              Agencies", "National Agencies", and "Government".
+            </p>
+            <div className="w-72 justify-center mx-40" id="Client_Distribution">
+              {isLoadingBookingData ? (
+                <Loader className="mx-auto" />
+              ) : updatedClient && updatedClient.datasets[0].data.length > 0 ? (
+                <Pie
+                  data={updatedClient}
+                  options={barDataConfigByClient.options}
+                  height={200}
+                  width={200}
+                  ref={chartRef}
+                  plugins={[ChartDataLabels, customLinesPlugin]}
+                />
+              ) : (
+                <p className="text-center">NA</p>
+              )}
             </div>
-          ) : null}
-        </>
-      )}
-    </div>
-    <div className="flex mt-2">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-4 p-4  min-h-[200px]">
-          <p className="font-bold">Client Type Distribution</p>
-          <p className="text-sm text-gray-600 italic">
-            This chart breaks down revenue by client type, including "Direct Clients", "Local
-            Agencies", "National Agencies", and "Government".
-          </p>
-          <div className="w-72 justify-center mx-40">
-            {isLoadingBookingData ? (
-              <p className="text-center">Loading...</p>
-            ) : updatedClient && updatedClient.datasets[0].data.length > 0 ? (
-              <Pie
-                data={updatedClient}
-                options={barDataConfigByClient.options}
-                height={200}
-                width={200}
-                ref={chartRef}
-                plugins={[ChartDataLabels, customLinesPlugin]}
-              />
-            ) : (
-              <p className="text-center">NA</p>
-            )}
           </div>
         </div>
       </div>
     </div>
-  </div>
   );
 };
 

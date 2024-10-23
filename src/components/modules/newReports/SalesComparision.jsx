@@ -43,7 +43,6 @@ const SalesComparision = () => {
     sortOrder: 'desc',
   });
 
-
   const {
     data: bookingData,
     isLoading: isLoadingBookingData,
@@ -128,8 +127,6 @@ const SalesComparision = () => {
   };
 
   const trendLineData = useMemo(() => calculateTrendLineData(), [salesData]);
-
-
 
   const combinedChartData = useMemo(() => {
     const colors = ['#FF6384', '#914EFB', '#36A2EB'];
@@ -218,36 +215,36 @@ const SalesComparision = () => {
     [salesData],
   );
   return (
-    <div className="flex p-6 flex-col ">
-    <div className="flex justify-between items-center">
-      <p className="font-bold"> Sales Comparison</p>
-    </div>
-    <p className="text-sm text-gray-600 italic pt-3">
-      This bar chart shows the sales trends for selected time duration
-    </p>
-    {isLoadingBookingData ? (
-      <div className="flex justify-center items-center h-64">
-        <Loader />
+    <div className="flex p-6 flex-col " id='Sales_comparision'>
+      <div className="flex justify-between items-center">
+        <p className="font-bold"> Sales Comparison</p>
       </div>
-    ) : (
-      <div className="">
-        {salesData.length > 0 ? (
-          <div className=" gap-10 ">
-            <div className="pt-4 w-[50rem]">
-              <Bar
-                ref={chartRef}
-                data={combinedChartData}
-                options={combinedChartOptions}
-                plugins={[ChartDataLabels]}
-              />
+      <p className="text-sm text-gray-600 italic pt-3">
+        This bar chart shows the sales trends for selected time duration
+      </p>
+      {isLoadingBookingData ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader />
+        </div>
+      ) : (
+        <div className="">
+          {salesData.length > 0 ? (
+            <div className=" gap-10 ">
+              <div className="pt-4 w-[50rem]">
+                <Bar
+                  ref={chartRef}
+                  data={combinedChartData}
+                  options={combinedChartOptions}
+                  plugins={[ChartDataLabels]}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <p className="text-center text-gray-600">No data available.</p>
-        )}
-      </div>
-    )}
-  </div>
+          ) : (
+            <p className="text-center text-gray-600">No data available.</p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

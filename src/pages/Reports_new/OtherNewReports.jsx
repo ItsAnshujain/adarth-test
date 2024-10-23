@@ -1,14 +1,11 @@
-import {
-  downloadPdf,
-} from '../../utils';
-import { Download, Loader } from 'react-feather';
-import {Button } from '@mantine/core';
+import { downloadPdf } from '../../utils';
+import { Download } from 'react-feather';
+import { Button } from '@mantine/core';
 import PerformanceCard from '../../components/modules/newReports/performanceCard';
 import RevenueCards from '../../components/modules/newReports/RevenueCards';
 import { downloadExcel } from '../../apis/requests/report.requests';
 import { useDownloadExcel, useShareReport } from '../../apis/queries/report.queries';
 import { showNotification } from '@mantine/notifications';
-import MediaWiseReport from '../OtherMediaReport/MediaWiseReport';
 import TagwiseReport from '../../components/modules/newReports/TagwiseReport';
 import SalesDistribution from '../../components/modules/newReports/SalesDistribution';
 import SalesComparision from '../../components/modules/newReports/SalesComparision';
@@ -86,7 +83,7 @@ const OtherNewReports = () => {
         <div className="py-5 flex items-start">
           <Button
             leftIcon={<Download size="20" color="white" />}
-            className="primary-button mx-3"
+            className="primary-button mx-3 pdf_download_button"
             onClick={handleDownloadPdf}
             loading={isDownloadPdfLoading}
             disabled={isDownloadPdfLoading}
@@ -106,51 +103,52 @@ const OtherNewReports = () => {
           </Button>
         </div>
       </div>
-      <div className="border-2 p-5 border-black">
-        <p className="font-bold text-lg"> Revenue </p>
-        <div className="overflow-hidden p-5 ">
+      <div id="New_reports">
+        <div className="border-2 p-5 border-black">
+          <p className="font-bold text-lg"> Revenue </p>
+
+          <RevenueBreakup />
+          <OrderDetails />
           <RevenueCards />
+
+          <ProposalDetails />
+          <SourceClientDistribution />
+          <RevenueDistribution />
+          <RevenueAndIndustriGraph />
+          <CategoryWiseReport />
+          <SalesOverview />
         </div>
-        <SourceClientDistribution />
-        <RevenueDistribution />
-        <RevenueAndIndustriGraph />
-        <CategoryWiseReport />
-        <SalesOverview />
-      </div>
-      <div className="border-2 p-5 border-black my-2">
-        <p className="font-bold text-lg"> Trends </p>
-        <TagwiseReport />
-        <SalesDistribution />
-        <SalesComparision />
-      </div>
-      <div className="border-2 p-5 border-black my-2">
-        <OperationalCosts />
-        <PrintingMountingCosts />
-      </div>
+        <div className="border-2 p-5 border-black my-2">
+          <p className="font-bold text-lg"> Trends </p>
+          <TagwiseReport />
+          <SalesDistribution />
+          <SalesComparision />
+        </div>
+        <div className="border-2 p-5 border-black my-2">
+          <OperationalCosts />
+          <PrintingMountingCosts />
+        </div>
 
-      <div className="border-2 p-5 border-black my-2">
-        <p className="font-bold text-lg"> Client Data</p>
+        <div className="border-2 p-5 border-black my-2">
+          <p className="font-bold text-lg"> Client Data</p>
 
-        <CampaignDetails />
-        <ClientDetails />
-        <PriceTradedMargin />
+          <CampaignCards />
+          <CampaignDetails />
+          <ClientDetails />
+          <PriceTradedMargin />
+        </div>
+
+        <InvoiceAmountCollReport />
+
+        <div className="overflow-y-auto px-5 col-span-10 w-[65rem]">
+          <p className="font-bold pt-10">Performance Ranking Report</p>
+          <p className="text-sm text-gray-600 italic py-4">
+            This report shows Performance Cards with pagination controls and a sortable, paginated
+            table.
+          </p>
+          <PerformanceCard />
+        </div>
       </div>
-
-      {/* <InvoiceAmountCollReport />
-
-      <div className="overflow-y-auto px-5 col-span-10 w-[65rem]">
-        <p className="font-bold pt-10">Performance Ranking Report</p>
-        <p className="text-sm text-gray-600 italic py-4">
-          This report shows Performance Cards with pagination controls and a sortable, paginated
-          table.
-        </p>
-        <PerformanceCard />
-      </div>
-
-      <OrderDetails />
-      <ProposalDetails />
-      <RevenueBreakup />
-      <CampaignCards /> */}
     </div>
   );
 };

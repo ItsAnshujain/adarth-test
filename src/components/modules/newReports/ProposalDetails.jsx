@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import { Text, Image } from '@mantine/core';
 import { useSearchParams } from 'react-router-dom';
-import {useBookingsNew } from '../../../apis/queries/booking.queries';
+import { useBookingsNew } from '../../../apis/queries/booking.queries';
 import { useFetchProposals } from '../../../apis/queries/proposal.queries';
 
 import ProposalSentIcon from '../../../assets/proposal-sent.svg';
 const ProposalDetails = () => {
-
-  
   // proposals data
   const [searchParams4, setSearchParams4] = useSearchParams({
     page: 1,
@@ -31,16 +29,16 @@ const ProposalDetails = () => {
 
   return (
     <div className="p-5">
-    <div className="border rounded p-8 flex-1 w-72">
-      <Image src={ProposalSentIcon} alt="folder" fit="contain" height={24} width={24} />
-      <p className="my-2 text-sm">
-        Total Proposals Created :{' '}
-        <span className="font-bold text-[17px]">{totalProposalsCreated}</span>
-      </p>
+      <div className="border rounded p-8 flex-1 w-72" id="Proposal_details">
+        <Image src={ProposalSentIcon} alt="folder" fit="contain" height={24} width={24} />
+        <p className="my-2 text-sm">
+          Total Proposals Created :{' '}
+          <span className="font-bold text-[17px]">{totalProposalsCreated}</span>
+        </p>
 
-      <p className="font-bold">{totalPriceInLacs} L</p>
+        <p className="font-bold">{totalPriceInLacs} L</p>
+      </div>
     </div>
-  </div>
   );
 };
 

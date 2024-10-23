@@ -188,7 +188,7 @@ const OperationalCosts = () => {
     events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
   };
   return (
-    <>
+    <div id='Operational_costs'>
     <p className="font-bold text-lg"> Operational Cost </p>
         <div className="mb-4 flex flex-col p-6">
           <p className="font-bold  ">Operational cost bifurcation</p>
@@ -206,7 +206,7 @@ const OperationalCosts = () => {
             />
           </div>
         </div>
-    </>
+    </div>
   );
 };
 
